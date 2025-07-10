@@ -3,35 +3,50 @@ import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
+import prettierPlugin from 'eslint-plugin-prettier'
+import * as prettierConfig from 'eslint-config-prettier'
 import { globalIgnores } from 'eslint/config'
 
-export default tseslint.config([
+export default [
   globalIgnores(['dist']),
+
+  ...tseslint.configs.recommended,
+
   {
-    parser: '@typescript-eslint/parser',
     files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
-      'eslint:recommended',
-      'plugin:react/recommended',
-      'plugin:react-hooks/recommended',
-      'plugin:@typescript-eslint/recommended',
-      'plugin:jsx-a11y/recommended',
-      'plugin:tailwindcss/recommended',
-      'prettier',
-    ],
-    plugins: ['react', '@typescript-eslint', 'jsx-a11y', 'tailwindcss'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parser: tseslint.parser,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.es2021,
+      },
+    },
+    plugins: {
+      prettier: prettierPlugin,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      // JS + TS base rules
+      ...js.configs.recommended.rules,
+      ...reactHooks.configs['recommended-latest'].rules,
+      ...reactRefresh.configs.vite.rules,
+
+      // Prettier
+      ...prettierConfig.rules,
+      'prettier/prettier': 'error',
+    },
     settings: {
       react: {
         version: 'detect',
       },
     },
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-    },
   },
-])
+]
