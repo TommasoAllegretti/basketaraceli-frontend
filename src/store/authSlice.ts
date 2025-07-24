@@ -1,12 +1,7 @@
 // src/store/authSlice.ts
+import type { User } from '@/models/user'
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-
-interface User {
-  id: number
-  name: string
-  email: string
-}
 
 interface AuthState {
   user: User | null

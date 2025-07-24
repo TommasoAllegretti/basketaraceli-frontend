@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom'
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   async function handleLogin(dispatch: AppDispatch, email: string, password: string) {
-    const response = await login(email, password) // previous login service
+    const response = await login(email, password)
     localStorage.setItem('token', response.token)
     dispatch(loginSuccess({ user: response.user, token: response.token }))
   }
@@ -29,8 +29,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     setLoading(true)
     try {
       await handleLogin(dispatch, email, password)
-      navigate('/dashboard') // redirect after login
-    } catch (error) {
+      navigate('/')
+    } catch (error: any) {
       alert('Invalid credentials')
     } finally {
       setLoading(false)

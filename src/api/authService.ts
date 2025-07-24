@@ -1,13 +1,9 @@
-// authService.ts
+import type { User } from '@/models/user'
 import api from './axios'
 
 interface LoginResponse {
   token: string
-  user: {
-    id: number
-    name: string
-    email: string
-  }
+  user: User
 }
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
@@ -15,7 +11,6 @@ export async function login(email: string, password: string): Promise<LoginRespo
     const response = await api.post<LoginResponse>('/login', { email, password })
     const { token } = response.data
 
-    // ✅ Save token in localStorage (or cookies, depending on security requirements)
     localStorage.setItem('token', token)
 
     return response.data
