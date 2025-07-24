@@ -5,17 +5,37 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
+    name: Build ⛏
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@main
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build app
+      - name: Build project
         run: npm run build
+
+      - name: Archive production artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: .
+          path: .
+
+  deploy:
+    name: Deploy 🚀
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+
+      - name: Download artifact
+        uses: actions/download-artifact@main
+        with:
+          name: .
 
       - name: Deploy
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
@@ -23,5 +43,5 @@ jobs:
           server: ${{ secrets.server }}
           username: ${{ secrets.username }}
           password: ${{ secrets.ftp_password }}
-          local-dir: build
+          local-dir: dist
           server-dir: /public_html/public/app
