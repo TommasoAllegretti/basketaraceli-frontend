@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Home } from './pages/Home'
 // import Dashboard from './pages/Dashboard'
 import { Login } from './pages/Login'
@@ -8,7 +8,7 @@ import { ThemeProvider } from './components/theme-provider'
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <Router>
+      <BrowserRouter basename="/admin">
         <Routes>
           {/* Public Route */}
           <Route path="/login" element={<Login />} />
@@ -26,7 +26,7 @@ function App() {
             }
           />
         </Routes>
-      </Router>
+      </BrowserRouter>
     </ThemeProvider>
   )
 }
