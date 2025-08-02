@@ -8,7 +8,15 @@ interface LoginResponse {
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
   try {
-    const response = await api.post<LoginResponse>('/api/login', { email, password })
+    const response = await api.post<LoginResponse>(
+      '/api/login',
+      { email, password },
+      {
+        headers: {
+          Accept: 'application/json',
+        },
+      },
+    )
     const { token } = response.data
 
     localStorage.setItem('token', token)
