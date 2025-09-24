@@ -5,9 +5,6 @@ const api = axios.create({
   withCredentials: true,
 })
 
-console.log(axios)
-console.log(import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : 'https://basketaraceli.it/api')
-
 api.interceptors.request.use(
   config => {
     const token = localStorage.getItem('token')
