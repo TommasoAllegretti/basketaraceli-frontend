@@ -22,8 +22,8 @@ export async function login(email: string, password: string): Promise<LoginRespo
     localStorage.setItem('token', token)
 
     return response.data
-  } catch (error: any) {
-    console.error('Login error:', error.response?.data || error.message)
+  } catch (error: unknown) {
+    console.error('Login error')
     throw error
   }
 }

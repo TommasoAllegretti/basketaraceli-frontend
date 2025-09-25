@@ -23,6 +23,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loginError, setLoginError] = useState(false)
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,8 +31,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     try {
       await handleLogin(dispatch, email, password)
       navigate('/')
-    } catch (error: any) {
-      alert('Invalid credentials')
+    } catch (error: unknown) {
+      setLoginError(true)
+      setTimeout(() => setLoginError(false), 5000)
+      throw error
     } finally {
       setLoading(false)
     }
@@ -74,6 +77,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 <Button type="submit" className="w-full">
                   {loading ? 'Logging in...' : 'Login'}
                 </Button>
+                {loginError && <div className="flex justify-center text-red-400">Invalid credentials</div>}
               </div>
             </div>
           </form>
