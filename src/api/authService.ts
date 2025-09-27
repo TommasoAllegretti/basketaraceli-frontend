@@ -27,3 +27,18 @@ export async function login(email: string, password: string): Promise<LoginRespo
     throw error
   }
 }
+
+export async function getCurrentUser(): Promise<User> {
+  try {
+    const response = await api.get<User>('user', {
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Get current user error')
+    throw error
+  }
+}
