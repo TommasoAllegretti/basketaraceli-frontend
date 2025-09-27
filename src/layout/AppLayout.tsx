@@ -14,7 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, Settings, User, LogOut } from 'lucide-react'
+import { Home, Settings, User, LogOut, Users } from 'lucide-react'
 
 interface AppLayoutProps {
   children: ReactNode
@@ -45,7 +45,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <a href="/">
+                    <a href="/admin">
                       <Home />
                       <span>Home</span>
                     </a>
@@ -53,9 +53,17 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
+                    <a href="/admin/players">
+                      <Users />
+                      <span>Giocatori</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
                     <a href="/admin/profile">
                       <User />
-                      <span>Profile</span>
+                      <span>Profilo</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -63,7 +71,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   <SidebarMenuButton asChild>
                     <a href="/admin/settings">
                       <Settings />
-                      <span>Settings</span>
+                      <span>Impostazioni</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -40,9 +40,18 @@ export function Profile() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Profilo</h1>
-          <p className="text-muted-foreground">Caricamento...</p>
+          <p className="text-muted-foreground">Le tue informazioni</p>
         </div>
-        <div className="grid gap-4">
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+            <CardContent className="p-6">
+              <div className="animate-pulse space-y-4">
+                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              </div>
+            </CardContent>
+          </Card>
           <Card>
             <CardContent className="p-6">
               <div className="animate-pulse space-y-4">

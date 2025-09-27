@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Home } from './pages/Home'
 import { Profile } from './pages/Profile'
+import { Players } from './pages/Players'
 // import Dashboard from './pages/Dashboard'
 import { Login } from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -22,6 +23,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/players" element={<Players />} />
                   {/* <Route path="/dashboard" element={<Dashboard />} /> */}
                 </Routes>
               </ProtectedRoute>
