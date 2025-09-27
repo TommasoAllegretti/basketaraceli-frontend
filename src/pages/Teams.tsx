@@ -184,12 +184,12 @@ export function Teams() {
             <CardContent className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <Trophy className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{team.abbreviation}</span>
+                <span className="text-muted-foreground">{team.abbreviation ?? '-'}</span>
               </div>
 
               <div className="flex items-center gap-2 text-sm">
                 <Building className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{team.club.name}</span>
+                <span className="text-muted-foreground">{team.club.name ?? '-'}</span>
               </div>
 
               <div className="pt-2">
