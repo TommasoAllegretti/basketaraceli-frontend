@@ -15,15 +15,18 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { Home, Settings, User, LogOut, Users, Shield } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 interface AppLayoutProps {
   children: ReactNode
 }
 
 const AppLayout = ({ children }: AppLayoutProps) => {
+  const navigate = useNavigate()
+
   const handleLogout = () => {
     localStorage.removeItem('token')
-    window.location.href = '/login'
+    navigate('/login')
   }
 
   return (
