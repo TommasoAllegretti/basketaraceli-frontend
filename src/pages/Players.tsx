@@ -226,7 +226,12 @@ export function Players() {
               )}
 
               <div className="flex gap-2 pt-2">
-                <Button size="sm" variant="outline" className="flex-1 cursor-pointer">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1 cursor-pointer"
+                  onClick={() => (window.location.href = `/admin/player?id=${player.id}`)}
+                >
                   Vedi
                 </Button>
                 <Button size="sm" variant="outline" className="flex-1 cursor-pointer">

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Home } from './pages/Home'
 import { Profile } from './pages/Profile'
 import { Players } from './pages/Players'
+import { Player } from './pages/Player'
 import { Teams } from './pages/Teams'
 // import Dashboard from './pages/Dashboard'
 import { Login } from './pages/Login'
@@ -25,6 +26,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/players" element={<Players />} />
+                  <Route path="/player" element={<Player />} />
                   <Route path="/teams" element={<Teams />} />
                   {/* <Route path="/dashboard" element={<Dashboard />} /> */}
                 </Routes>
