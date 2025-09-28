@@ -14,7 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, Settings, User, LogOut, Users, Shield } from 'lucide-react'
+import { Home, Settings, User, LogOut, Users, Shield, Building } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface AppLayoutProps {
@@ -62,6 +62,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                     <a href="/admin/teams">
                       <Shield />
                       <span>Squadre</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <a href="/admin/clubs">
+                      <Building />
+                      <span>Società</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
