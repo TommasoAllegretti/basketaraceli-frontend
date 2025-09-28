@@ -48,9 +48,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <a href="/admin">
+                    <a href="/admin/dashboard">
                       <Home />
-                      <span>Home</span>
+                      <span>Dashboard</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

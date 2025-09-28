@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Home } from './pages/Home'
 import { Profile } from './pages/Profile'
 import { Players } from './pages/Players'
@@ -23,12 +23,12 @@ function App() {
             element={
               <ProtectedRoute>
                 <Routes>
-                  <Route path="/" element={<Home />} />
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<Home />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/players" element={<Players />} />
                   <Route path="/player" element={<Player />} />
                   <Route path="/teams" element={<Teams />} />
-                  {/* <Route path="/dashboard" element={<Dashboard />} /> */}
                 </Routes>
               </ProtectedRoute>
             }
