@@ -4,6 +4,7 @@ import { Profile } from './pages/Profile'
 import { Players } from './pages/Players'
 import { Player } from './pages/Player'
 import { Teams } from './pages/Teams'
+import { Team } from './pages/Team'
 // import Dashboard from './pages/Dashboard'
 import { Login } from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -29,6 +30,7 @@ function App() {
                   <Route path="/players" element={<Players />} />
                   <Route path="/player" element={<Player />} />
                   <Route path="/teams" element={<Teams />} />
+                  <Route path="/team" element={<Team />} />
                 </Routes>
               </ProtectedRoute>
             }

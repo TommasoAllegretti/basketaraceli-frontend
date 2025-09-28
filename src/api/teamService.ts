@@ -15,3 +15,18 @@ export async function getTeams(): Promise<Team[]> {
     throw error
   }
 }
+
+export async function getTeam(id: number): Promise<Team> {
+  try {
+    const response = await api.get<Team>(`teams/${id}`, {
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Get team error')
+    throw error
+  }
+}

@@ -148,7 +148,12 @@ export function Profile() {
 
             <div>
               <p className="text-sm font-medium">Player ID</p>
-              <p className="text-sm text-muted-foreground">#{user.player_id}</p>
+              <p
+                className="text-sm underline hover:no-underline cursor-pointer text-blue-500"
+                onClick={() => (window.location.href = `/admin/player?id=${user.player_id}`)}
+              >
+                #{user.player_id}
+              </p>
             </div>
 
             <div>

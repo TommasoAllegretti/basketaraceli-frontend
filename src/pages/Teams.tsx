@@ -202,11 +202,16 @@ export function Teams() {
               </div>
 
               <div className="text-xs text-muted-foreground pt-2">
-                <p>Created: {new Date(team.created_at).toLocaleDateString()}</p>
+                <p>Creato: {new Date(team.created_at).toLocaleDateString()}</p>
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Button size="sm" variant="outline" className="flex-1 cursor-pointer">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1 cursor-pointer"
+                  onClick={() => (window.location.href = `/admin/team?id=${team.id}`)}
+                >
                   Vedi
                 </Button>
                 <Button size="sm" variant="outline" className="flex-1 cursor-pointer">

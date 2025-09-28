@@ -14,6 +14,25 @@ export interface League {
   deleted_at: string | null
 }
 
+export interface TeamPlayer {
+  id: number
+  name: string
+  position: string
+  height_cm: number
+  birth_date: string
+  jersey_number: number
+  points_per_game: string
+  rebounds_per_game: string
+  assists_per_game: string
+  created_at: string
+  updated_at: string
+  deleted_at: string | null
+  pivot: {
+    player_id: number
+    team_id: number
+  }
+}
+
 export interface Team {
   id: number
   club_id: number
@@ -25,4 +44,5 @@ export interface Team {
   deleted_at: string | null
   club: Club
   league: League
+  players?: TeamPlayer[]
 }
