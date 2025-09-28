@@ -5,38 +5,43 @@ import { Players } from './pages/Players'
 import { Player } from './pages/Player'
 import { Teams } from './pages/Teams'
 import { Team } from './pages/Team'
+import { CreateTeam } from './pages/CreateTeam'
 // import Dashboard from './pages/Dashboard'
 import { Login } from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ThemeProvider } from './components/theme-provider'
+import { AuthProvider } from './contexts/AuthContext'
 
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-      <BrowserRouter basename="/admin">
-        <Routes>
-          {/* Public Route */}
-          <Route path="/login" element={<Login />} />
+      <AuthProvider>
+        <BrowserRouter basename="/admin">
+          <Routes>
+            {/* Public Route */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute>
-                <Routes>
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="/dashboard" element={<Home />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/players" element={<Players />} />
-                  <Route path="/player" element={<Player />} />
-                  <Route path="/teams" element={<Teams />} />
-                  <Route path="/team" element={<Team />} />
-                </Routes>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
+            {/* Protected Routes */}
+            <Route
+              path="/*"
+              element={
+                <ProtectedRoute>
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/dashboard" element={<Home />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/players" element={<Players />} />
+                    <Route path="/player" element={<Player />} />
+                    <Route path="/teams" element={<Teams />} />
+                    <Route path="/team" element={<Team />} />
+                    <Route path="/create-team" element={<CreateTeam />} />
+                  </Routes>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   )
 }

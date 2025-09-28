@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Shield, Building, Trophy, ChevronLeft, ChevronRight } from 'lucide-react'
 import { getTeams } from '@/api/teamService'
+import { useAuth } from '@/contexts/AuthContext'
 import type { Team } from '@/models/team'
 
 export function Teams() {
+  const navigate = useNavigate()
+  const { isAdmin } = useAuth()
   const [allTeams, setAllTeams] = useState<Team[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -168,7 +172,11 @@ export function Teams() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Squadre</h1>
         </div>
-        <Button className=" cursor-pointer">Aggiungi Squadra</Button>
+        {isAdmin && (
+          <Button className="cursor-pointer" onClick={() => navigate('/create-team')}>
+            Aggiungi Squadra
+          </Button>
+        )}
       </div>
 
       {/* Teams Grid */}

@@ -30,3 +30,30 @@ export async function getTeam(id: number): Promise<Team> {
     throw error
   }
 }
+
+export interface CreateTeamData {
+  abbreviation: string
+  league_id?: number
+  club_id?: number
+}
+
+export interface CreateTeamResponse {
+  message: string
+  team: Team
+}
+
+export async function createTeam(data: CreateTeamData): Promise<CreateTeamResponse> {
+  try {
+    const response = await api.post<CreateTeamResponse>('teams', data, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Create team error')
+    throw error
+  }
+}

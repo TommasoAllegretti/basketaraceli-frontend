@@ -9,16 +9,20 @@ import { login } from '@/api/authService'
 import type { AppDispatch } from '@/store/store'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
-  async function handleLogin(dispatch: AppDispatch, email: string, password: string) {
+  async function handleLogin(dispatch: AppDispatch, email: string, password: string, refreshUser: () => Promise<void>) {
     const response = await login(email, password)
     localStorage.setItem('token', response.token)
     dispatch(loginSuccess({ user: response.user, token: response.token }))
+    // Refresh the auth context with user data
+    await refreshUser()
   }
 
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
+  const { refreshUser } = useAuth()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -29,7 +33,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     e.preventDefault()
     setLoading(true)
     try {
-      await handleLogin(dispatch, email, password)
+      await handleLogin(dispatch, email, password, refreshUser)
       navigate('/')
     } catch (error: unknown) {
       setLoginError(true)

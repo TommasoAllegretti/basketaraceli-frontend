@@ -15,19 +15,14 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { Home, Settings, User, LogOut, Users, Shield } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface AppLayoutProps {
   children: ReactNode
 }
 
 const AppLayout = ({ children }: AppLayoutProps) => {
-  const navigate = useNavigate()
-
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/login')
-  }
+  const { logout } = useAuth()
 
   return (
     <SidebarProvider>
@@ -94,7 +89,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={handleLogout} className="cursor-pointer">
+              <SidebarMenuButton onClick={logout} className="cursor-pointer">
                 <LogOut />
                 <span>Logout</span>
               </SidebarMenuButton>
