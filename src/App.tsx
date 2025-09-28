@@ -12,7 +12,7 @@ import { ThemeProvider } from './components/theme-provider'
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-      <BrowserRouter>
+      <BrowserRouter basename="/admin">
         <Routes>
           {/* Public Route */}
           <Route path="/login" element={<Login />} />
