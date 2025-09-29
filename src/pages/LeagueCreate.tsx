@@ -58,7 +58,7 @@ export function LeagueCreate() {
       setTimeout(() => {
         navigate('/leagues')
       }, 2000)
-    } catch (err: unknown) {
+    } catch (err: any) {
       if (err.response?.status === 403) {
         setError('Non autorizzato. Solo gli amministratori possono creare campionati.')
       } else if (err.response?.data?.message) {
