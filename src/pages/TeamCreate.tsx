@@ -37,8 +37,8 @@ export function TeamCreate() {
         setLeagues(leaguesData)
         setClubs(clubsData)
       } catch (err) {
-        console.error('Error fetching data:', err)
-        setError('Failed to load leagues and clubs')
+        console.error('Errore nel recupero dei dati:', err)
+        setError('Impossibile caricare campionati e società')
       } finally {
         setDataLoading(false)
       }
@@ -52,7 +52,7 @@ export function TeamCreate() {
       ...prev,
       [field]: value,
     }))
-    // Clear messages when user starts typing
+    // Pulisci i messaggi quando l'utente inizia a digitare
     if (error) setError(null)
     if (success) setSuccess(null)
   }
@@ -61,7 +61,7 @@ export function TeamCreate() {
     e.preventDefault()
 
     if (!formData.abbreviation.trim()) {
-      setError('Abbreviation is required')
+      setError("L'abbreviazione della squadra è obbligatoria")
       return
     }
 
@@ -76,7 +76,7 @@ export function TeamCreate() {
         club_id: formData.club_id || undefined,
       })
 
-      setSuccess(response.message)
+      setSuccess(response.message || 'Squadra creata con successo')
 
       // Reset form
       setFormData({
@@ -85,19 +85,19 @@ export function TeamCreate() {
         club_id: undefined,
       })
 
-      // Redirect to teams list after a short delay
+      // Reindirizza alla lista squadre dopo un breve ritardo
       setTimeout(() => {
         navigate('/teams')
       }, 2000)
     } catch (err: unknown) {
       if (err.response?.status === 403) {
-        setError('Unauthorized. Only administrators can create teams.')
+        setError('Non autorizzato. Solo gli amministratori possono creare squadre.')
       } else if (err.response?.data?.message) {
         setError(err.response.data.message)
       } else {
-        setError('Failed to create team. Please try again.')
+        setError('Impossibile creare la squadra. Riprova.')
       }
-      console.error('Error creating team:', err)
+      console.error('Errore nella creazione della squadra:', err)
     } finally {
       setLoading(false)
     }
@@ -109,12 +109,11 @@ export function TeamCreate() {
         <div className="flex items-center gap-4">
           <Button variant="outline" size="sm" onClick={() => navigate('/teams')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Teams
+            Torna alle Squadre
           </Button>
         </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Create New Team</h1>
-          <p className="text-muted-foreground">Loading form data...</p>
+          <h1 className="text-3xl font-bold tracking-tight">Crea Nuova Squadra</h1>
         </div>
         <Card>
           <CardContent className="p-6">
@@ -137,12 +136,11 @@ export function TeamCreate() {
         <div className="flex items-center gap-4">
           <Button variant="outline" size="sm" onClick={() => navigate('/teams')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Teams
+            Torna alle Squadre
           </Button>
         </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Create New Team</h1>
-          <p className="text-muted-foreground">Loading...</p>
+          <h1 className="text-3xl font-bold tracking-tight">Crea Nuova Squadra</h1>
         </div>
         <Card>
           <CardContent className="p-6">
@@ -164,20 +162,20 @@ export function TeamCreate() {
         <div className="flex items-center gap-4">
           <Button variant="outline" size="sm" onClick={() => navigate('/teams')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Teams
+            Torna alle Squadre
           </Button>
         </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Create New Team</h1>
-          <p className="text-muted-foreground">Add a new team to the system</p>
+          <h1 className="text-3xl font-bold tracking-tight">Crea Nuova Squadra</h1>
+          <p className="text-muted-foreground">Aggiungi una nuova squadra al sistema</p>
         </div>
         <Card>
           <CardContent className="p-6">
             <div className="text-center">
               <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <p className="text-red-600 mb-4">Unauthorized Access</p>
-              <p className="text-muted-foreground mb-4">Only administrators can create teams.</p>
-              <Button onClick={() => navigate('/teams')}>Back to Teams</Button>
+              <p className="text-red-600 mb-4">Accesso Non Autorizzato</p>
+              <p className="text-muted-foreground mb-4">Solo gli amministratori possono creare squadre.</p>
+              <Button onClick={() => navigate('/teams')}>Torna alle Squadre</Button>
             </div>
           </CardContent>
         </Card>
@@ -187,20 +185,17 @@ export function TeamCreate() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Intestazione */}
       <div className="flex items-center gap-4">
         <Button variant="outline" size="sm" onClick={() => navigate('/teams')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Teams
+          Torna alle Squadre
         </Button>
       </div>
 
       <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-          <Plus className="h-8 w-8" />
-          Create New Team
-        </h1>
-        <p className="text-muted-foreground">Add a new team to the system</p>
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">Crea Nuova Squadra</h1>
+        <p className="text-muted-foreground">Aggiungi una nuova squadra al sistema</p>
       </div>
 
       {/* Form */}
@@ -209,33 +204,35 @@ export function TeamCreate() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              Team Information
+              Informazioni Squadra
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Abbreviation */}
+              {/* Abbreviazione */}
               <div className="space-y-2">
                 <Label htmlFor="abbreviation">
-                  Team Abbreviation <span className="text-red-500">*</span>
+                  Abbreviazione Squadra <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="abbreviation"
                   type="text"
-                  placeholder="e.g., LAL, MIA, BOS"
+                  placeholder="es. LAL, MIA, BOS"
                   value={formData.abbreviation}
                   onChange={e => handleInputChange('abbreviation', e.target.value)}
                   maxLength={10}
                   required
                 />
-                <p className="text-sm text-muted-foreground">Short abbreviation for the team (max 10 characters)</p>
+                <p className="text-sm text-muted-foreground">
+                  Abbreviazione breve per la squadra (massimo 10 caratteri)
+                </p>
               </div>
 
-              {/* League */}
+              {/* Campionato */}
               <div className="space-y-2">
                 <Label htmlFor="league">
                   <Trophy className="h-4 w-4 inline mr-1" />
-                  League (Optional)
+                  Campionato (Opzionale)
                 </Label>
                 <select
                   id="league"
@@ -243,7 +240,7 @@ export function TeamCreate() {
                   value={formData.league_id || ''}
                   onChange={e => handleInputChange('league_id', e.target.value ? parseInt(e.target.value) : undefined)}
                 >
-                  <option value="">Select a league (optional)</option>
+                  <option value="">Seleziona un campionato (opzionale)</option>
                   {leagues.map(league => (
                     <option key={league.id} value={league.id}>
                       {league.name}
@@ -252,11 +249,11 @@ export function TeamCreate() {
                 </select>
               </div>
 
-              {/* Club */}
+              {/* Società */}
               <div className="space-y-2">
                 <Label htmlFor="club">
                   <Building className="h-4 w-4 inline mr-1" />
-                  Club (Optional)
+                  Società (Opzionale)
                 </Label>
                 <select
                   id="club"
@@ -264,7 +261,7 @@ export function TeamCreate() {
                   value={formData.club_id || ''}
                   onChange={e => handleInputChange('club_id', e.target.value ? parseInt(e.target.value) : undefined)}
                 >
-                  <option value="">Select a club (optional)</option>
+                  <option value="">Seleziona una società (opzionale)</option>
                   {clubs.map(club => (
                     <option key={club.id} value={club.id}>
                       {club.name}
@@ -280,56 +277,80 @@ export function TeamCreate() {
                 </div>
               )}
 
-              {/* Success Message */}
+              {/* Messaggio di Successo */}
               {success && (
                 <div className="p-4 bg-green-50 border border-green-200 rounded-md">
                   <p className="text-green-600 text-sm">{success}</p>
-                  <p className="text-green-600 text-xs mt-1">Redirecting to teams list...</p>
+                  <p className="text-green-600 text-xs mt-1">Reindirizzamento alla lista squadre...</p>
                 </div>
               )}
 
-              {/* Submit Button */}
+              {/* Pulsante Invio */}
               <div className="flex gap-4">
                 <Button type="submit" disabled={loading || !formData.abbreviation.trim()} className="flex-1">
                   {loading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Creating Team...
+                      Creazione Squadra...
                     </>
                   ) : (
                     <>
                       <Plus className="h-4 w-4 mr-2" />
-                      Create Team
+                      Crea Squadra
                     </>
                   )}
                 </Button>
 
                 <Button type="button" variant="outline" onClick={() => navigate('/teams')} disabled={loading}>
-                  Cancel
+                  Annulla
                 </Button>
               </div>
             </form>
           </CardContent>
         </Card>
 
-        {/* Help Card */}
+        {/* Card di Aiuto */}
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle className="text-lg">Help</CardTitle>
+            <CardTitle className="text-lg">Aiuto</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-2">
             <p>
-              <strong>Abbreviation:</strong> A short code to identify the team (e.g., "LAL" for Los Angeles Lakers)
+              <strong>Abbreviazione:</strong> Un codice breve per identificare la squadra (es. "LAL" per Los Angeles
+              Lakers)
             </p>
             <p>
-              <strong>League:</strong> The league this team competes in (optional)
+              <strong>Campionato:</strong> Il campionato in cui compete questa squadra (opzionale)
             </p>
             <p>
-              <strong>Club:</strong> The club this team belongs to (optional)
+              <strong>Società:</strong> La società a cui appartiene questa squadra (opzionale)
             </p>
             <p>
-              <strong>Note:</strong> Only administrators can create teams
+              <strong>Nota:</strong> Solo gli amministratori possono creare squadre
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Card Esempi */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-lg">Esempi di Abbreviazioni Squadra</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-2 text-sm">
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <p className="font-medium">LAL</p>
+                <p className="text-muted-foreground text-xs">Los Angeles Lakers</p>
+              </div>
+              <div className="p-3 bg-green-50 rounded-lg">
+                <p className="font-medium">MIA</p>
+                <p className="text-muted-foreground text-xs">Miami Heat</p>
+              </div>
+              <div className="p-3 bg-purple-50 rounded-lg">
+                <p className="font-medium">BOS</p>
+                <p className="text-muted-foreground text-xs">Boston Celtics</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
