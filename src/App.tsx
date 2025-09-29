@@ -5,10 +5,11 @@ import { Players } from './pages/Players'
 import { Player } from './pages/Player'
 import { Teams } from './pages/Teams'
 import { Team } from './pages/Team'
-import { CreateTeam } from './pages/CreateTeam'
+import { TeamCreate } from './pages/TeamCreate'
 import { Clubs } from './pages/Clubs'
 import { Club } from './pages/Club'
 import { Leagues } from './pages/Leagues'
+import { LeagueCreate } from './pages/LeagueCreate'
 // import Dashboard from './pages/Dashboard'
 import { Login } from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -37,10 +38,11 @@ function App() {
                     <Route path="/player" element={<Player />} />
                     <Route path="/teams" element={<Teams />} />
                     <Route path="/team" element={<Team />} />
-                    <Route path="/create-team" element={<CreateTeam />} />
+                    <Route path="/create-team" element={<TeamCreate />} />
                     <Route path="/clubs" element={<Clubs />} />
                     <Route path="/club" element={<Club />} />
                     <Route path="/leagues" element={<Leagues />} />
+                    <Route path="/create-league" element={<LeagueCreate />} />
                   </Routes>
                 </ProtectedRoute>
               }

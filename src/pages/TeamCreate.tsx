@@ -12,9 +12,9 @@ import { useAuth } from '@/contexts/AuthContext'
 import type { League } from '@/models/league'
 import type { Club } from '@/models/club'
 
-export function CreateTeam() {
+export function TeamCreate() {
   const navigate = useNavigate()
-  const { isAdmin } = useAuth()
+  const { isAdmin, loading: authLoading } = useAuth()
 
   const [formData, setFormData] = useState<CreateTeamData>({
     abbreviation: '',
@@ -89,7 +89,7 @@ export function CreateTeam() {
       setTimeout(() => {
         navigate('/teams')
       }, 2000)
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err.response?.status === 403) {
         setError('Unauthorized. Only administrators can create teams.')
       } else if (err.response?.data?.message) {
@@ -130,7 +130,35 @@ export function CreateTeam() {
     )
   }
 
-  if (!isAdmin) {
+  // Show loading while auth context is loading
+  if (authLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={() => navigate('/teams')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Teams
+          </Button>
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Create New Team</h1>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // Show unauthorized only after auth is loaded and user is confirmed not admin
+  if (!authLoading && !isAdmin) {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
