@@ -7,6 +7,7 @@ import { Teams } from './pages/Teams'
 import { Team } from './pages/Team'
 import { CreateTeam } from './pages/CreateTeam'
 import { Clubs } from './pages/Clubs'
+import { Leagues } from './pages/Leagues'
 // import Dashboard from './pages/Dashboard'
 import { Login } from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -37,6 +38,7 @@ function App() {
                     <Route path="/team" element={<Team />} />
                     <Route path="/create-team" element={<CreateTeam />} />
                     <Route path="/clubs" element={<Clubs />} />
+                    <Route path="/leagues" element={<Leagues />} />
                   </Routes>
                 </ProtectedRoute>
               }
