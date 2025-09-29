@@ -77,7 +77,7 @@ export function Team() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => navigate('/admin/teams')}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/teams')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Torna a lista squadre
           </Button>
@@ -106,7 +106,7 @@ export function Team() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => navigate('/admin/teams')}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/teams')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Torna a lista squadre
           </Button>
@@ -134,7 +134,7 @@ export function Team() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="outline" size="sm" onClick={() => navigate('/admin/teams')}>
+        <Button variant="outline" size="sm" onClick={() => navigate('/teams')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Torna a lista squadre
         </Button>
