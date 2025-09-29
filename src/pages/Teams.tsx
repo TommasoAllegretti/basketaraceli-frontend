@@ -222,9 +222,16 @@ export function Teams() {
                 >
                   Vedi
                 </Button>
-                <Button size="sm" variant="outline" className="flex-1 cursor-pointer">
-                  Modifica
-                </Button>
+                {isAdmin && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 cursor-pointer"
+                    onClick={() => navigate(`/edit-team?id=${team.id}`)}
+                  >
+                    Modifica
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

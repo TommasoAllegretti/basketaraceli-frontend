@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Shield, ArrowLeft, Plus, Building, Trophy, AlertCircle } from 'lucide-react'
-import { createTeam, type CreateTeamData } from '@/api/teamService'
+import { Shield, ArrowLeft, Save, Building, Trophy, AlertCircle } from 'lucide-react'
+import { getTeam, updateTeam, type UpdateTeamData } from '@/api/teamService'
 import { getLeagues } from '@/api/leagueService'
 import { getClubs } from '@/api/clubService'
 import { useAuth } from '@/contexts/AuthContext'
 import type { League } from '@/models/league'
 import type { Club } from '@/models/club'
+import type { Team } from '@/models/team'
 
-export function TeamCreate() {
+export function TeamEdit() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const teamId = searchParams.get('id')
   const { isAdmin, loading: authLoading } = useAuth()
 
-  const [formData, setFormData] = useState<CreateTeamData>({
+  const [team, setTeam] = useState<Team | null>(null)
+  const [formData, setFormData] = useState<UpdateTeamData>({
     abbreviation: '',
     league_id: undefined,
     club_id: undefined,
@@ -31,23 +35,51 @@ export function TeamCreate() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!teamId) {
+        setError('ID squadra non fornito')
+        setDataLoading(false)
+        return
+      }
+
+      const id = parseInt(teamId, 10)
+      if (isNaN(id)) {
+        setError('ID squadra non valido')
+        setDataLoading(false)
+        return
+      }
+
       try {
         setDataLoading(true)
-        const [leaguesData, clubsData] = await Promise.all([getLeagues(), getClubs()])
+        const [teamData, leaguesData, clubsData] = await Promise.all([getTeam(id), getLeagues(), getClubs()])
+
+        setTeam(teamData)
         setLeagues(leaguesData)
         setClubs(clubsData)
-      } catch (err) {
+
+        // Popola il form con i dati esistenti
+        setFormData({
+          abbreviation: teamData.abbreviation,
+          league_id: teamData.league?.id,
+          club_id: teamData.club?.id,
+        })
+      } catch (err: any) {
         console.error('Errore nel recupero dei dati:', err)
-        setError('Impossibile caricare campionati e società')
+        if (err.response?.status === 403) {
+          setError('Non autorizzato. Non hai i permessi per modificare questa squadra.')
+        } else if (err.response?.status === 404) {
+          setError('Squadra non trovata.')
+        } else {
+          setError('Impossibile caricare i dati della squadra')
+        }
       } finally {
         setDataLoading(false)
       }
     }
 
     fetchData()
-  }, [])
+  }, [teamId])
 
-  const handleInputChange = (field: keyof CreateTeamData, value: string | number | undefined) => {
+  const handleInputChange = (field: keyof UpdateTeamData, value: string | number | undefined) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -59,6 +91,11 @@ export function TeamCreate() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!teamId) {
+      setError('ID squadra mancante')
+      return
+    }
 
     if (!formData.abbreviation.trim()) {
       setError("L'abbreviazione della squadra è obbligatoria")
@@ -80,34 +117,27 @@ export function TeamCreate() {
       setError(null)
       setSuccess(null)
 
-      const response = await createTeam({
+      const response = await updateTeam(parseInt(teamId, 10), {
         abbreviation: formData.abbreviation.trim(),
-        league_id: formData.league_id || undefined,
-        club_id: formData.club_id || undefined,
+        league_id: formData.league_id,
+        club_id: formData.club_id,
       })
 
-      setSuccess(response.message || 'Squadra creata con successo')
+      setSuccess(response.message || 'Squadra aggiornata con successo')
 
-      // Reset form
-      setFormData({
-        abbreviation: '',
-        league_id: undefined,
-        club_id: undefined,
-      })
-
-      // Reindirizza alla lista squadre dopo un breve ritardo
+      // Reindirizza alla pagina della squadra dopo un breve ritardo
       setTimeout(() => {
-        navigate('/teams')
+        navigate(`/team?id=${teamId}`)
       }, 2000)
     } catch (err: any) {
       if (err.response?.status === 403) {
-        setError('Non autorizzato. Solo gli amministratori possono creare squadre.')
+        setError('Non autorizzato. Solo gli amministratori possono modificare squadre.')
       } else if (err.response?.data?.message) {
         setError(err.response.data.message)
       } else {
-        setError('Impossibile creare la squadra. Riprova.')
+        setError('Impossibile aggiornare la squadra. Riprova.')
       }
-      console.error('Errore nella creazione della squadra:', err)
+      console.error("Errore nell'aggiornamento della squadra:", err)
     } finally {
       setLoading(false)
     }
@@ -123,7 +153,8 @@ export function TeamCreate() {
           </Button>
         </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Crea Nuova Squadra</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Modifica Squadra</h1>
+          <p className="text-muted-foreground">Caricamento dati squadra...</p>
         </div>
         <Card>
           <CardContent className="p-6">
@@ -150,7 +181,8 @@ export function TeamCreate() {
           </Button>
         </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Crea Nuova Squadra</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Modifica Squadra</h1>
+          <p className="text-muted-foreground">Caricamento...</p>
         </div>
         <Card>
           <CardContent className="p-6">
@@ -176,15 +208,41 @@ export function TeamCreate() {
           </Button>
         </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Crea Nuova Squadra</h1>
-          <p className="text-muted-foreground">Aggiungi una nuova squadra al sistema</p>
+          <h1 className="text-3xl font-bold tracking-tight">Modifica Squadra</h1>
+          <p className="text-muted-foreground">Modifica una squadra esistente</p>
         </div>
         <Card>
           <CardContent className="p-6">
             <div className="text-center">
               <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
               <p className="text-red-600 mb-4">Accesso Non Autorizzato</p>
-              <p className="text-muted-foreground mb-4">Solo gli amministratori possono creare squadre.</p>
+              <p className="text-muted-foreground mb-4">Solo gli amministratori possono modificare squadre.</p>
+              <Button onClick={() => navigate('/teams')}>Torna alle Squadre</Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (error && !team) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={() => navigate('/teams')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Torna alle Squadre
+          </Button>
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Modifica Squadra</h1>
+          <p className="text-muted-foreground">Modifica una squadra esistente</p>
+        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <p className="text-red-600 mb-4">{error}</p>
               <Button onClick={() => navigate('/teams')}>Torna alle Squadre</Button>
             </div>
           </CardContent>
@@ -201,11 +259,19 @@ export function TeamCreate() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Torna alle Squadre
         </Button>
+        {team && (
+          <Button variant="outline" size="sm" onClick={() => navigate(`/team?id=${team.id}`)}>
+            Visualizza Squadra
+          </Button>
+        )}
       </div>
 
       <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">Crea Nuova Squadra</h1>
-        <p className="text-muted-foreground">Aggiungi una nuova squadra al sistema</p>
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+          <Save className="h-8 w-8" />
+          Modifica Squadra
+        </h1>
+        <p className="text-muted-foreground">{team ? `Modifica ${team.name}` : 'Modifica una squadra esistente'}</p>
       </div>
 
       {/* Form */}
@@ -280,7 +346,7 @@ export function TeamCreate() {
                 </select>
               </div>
 
-              {/* Error Message */}
+              {/* Messaggio di Errore */}
               {error && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-md">
                   <p className="text-red-600 text-sm">{error}</p>
@@ -291,11 +357,11 @@ export function TeamCreate() {
               {success && (
                 <div className="p-4 bg-green-50 border border-green-200 rounded-md">
                   <p className="text-green-600 text-sm">{success}</p>
-                  <p className="text-green-600 text-xs mt-1">Reindirizzamento alla lista squadre...</p>
+                  <p className="text-green-600 text-xs mt-1">Reindirizzamento alla pagina squadra...</p>
                 </div>
               )}
 
-              {/* Pulsante Invio */}
+              {/* Pulsanti */}
               <div className="flex gap-4">
                 <Button
                   type="submit"
@@ -305,12 +371,12 @@ export function TeamCreate() {
                   {loading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Creazione Squadra...
+                      Aggiornamento Squadra...
                     </>
                   ) : (
                     <>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Crea Squadra
+                      <Save className="h-4 w-4 mr-2" />
+                      Aggiorna Squadra
                     </>
                   )}
                 </Button>
@@ -340,34 +406,11 @@ export function TeamCreate() {
               <strong>Società:</strong> La società a cui appartiene questa squadra (obbligatorio)
             </p>
             <p>
-              <strong>Requisiti:</strong> Tutti i campi sono obbligatori per creare una squadra
+              <strong>Requisiti:</strong> Tutti i campi sono obbligatori per modificare una squadra
             </p>
             <p>
-              <strong>Nota:</strong> Solo gli amministratori possono creare squadre
+              <strong>Nota:</strong> Solo gli amministratori possono modificare squadre
             </p>
-          </CardContent>
-        </Card>
-
-        {/* Card Esempi */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-lg">Esempi di Abbreviazioni Squadra</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-2 text-sm">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="font-medium">LAL</p>
-                <p className="text-muted-foreground text-xs">Los Angeles Lakers</p>
-              </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <p className="font-medium">MIA</p>
-                <p className="text-muted-foreground text-xs">Miami Heat</p>
-              </div>
-              <div className="p-3 bg-purple-50 rounded-lg">
-                <p className="font-medium">BOS</p>
-                <p className="text-muted-foreground text-xs">Boston Celtics</p>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>

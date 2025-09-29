@@ -57,3 +57,30 @@ export async function createTeam(data: CreateTeamData): Promise<CreateTeamRespon
     throw error
   }
 }
+
+export interface UpdateTeamData {
+  abbreviation: string
+  league_id?: number
+  club_id?: number
+}
+
+export interface UpdateTeamResponse {
+  message: string
+  team: Team
+}
+
+export async function updateTeam(id: number, data: UpdateTeamData): Promise<UpdateTeamResponse> {
+  try {
+    const response = await api.put<UpdateTeamResponse>(`teams/${id}`, data, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Update team error')
+    throw error
+  }
+}

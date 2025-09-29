@@ -6,6 +6,7 @@ import { Player } from './pages/Player'
 import { Teams } from './pages/Teams'
 import { Team } from './pages/Team'
 import { TeamCreate } from './pages/TeamCreate'
+import { TeamEdit } from './pages/TeamEdit'
 import { Clubs } from './pages/Clubs'
 import { Club } from './pages/Club'
 import { Leagues } from './pages/Leagues'
@@ -39,6 +40,7 @@ function App() {
                     <Route path="/teams" element={<Teams />} />
                     <Route path="/team" element={<Team />} />
                     <Route path="/create-team" element={<TeamCreate />} />
+                    <Route path="/edit-team" element={<TeamEdit />} />
                     <Route path="/clubs" element={<Clubs />} />
                     <Route path="/club" element={<Club />} />
                     <Route path="/leagues" element={<Leagues />} />

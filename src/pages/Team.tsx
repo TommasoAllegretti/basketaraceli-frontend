@@ -4,11 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Shield, ArrowLeft, Calendar, Trophy, Building, Users, Ruler } from 'lucide-react'
 import { getTeam } from '@/api/teamService'
+import { useAuth } from '@/contexts/AuthContext'
 import type { Team as TeamType } from '@/models/team'
 
 export function Team() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { isAdmin } = useAuth()
   const teamId = searchParams.get('id')
 
   const [team, setTeam] = useState<TeamType | null>(null)
@@ -343,7 +345,11 @@ export function Team() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <Button variant="outline">Edit Team</Button>
+            {isAdmin && (
+              <Button variant="outline" onClick={() => navigate(`/edit-team?id=${team.id}`)}>
+                Edit Team
+              </Button>
+            )}
             <Button variant="outline">Manage Players</Button>
             <Button variant="outline">View Statistics</Button>
           </div>
