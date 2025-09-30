@@ -30,3 +30,28 @@ export async function getClub(id: number): Promise<Club> {
     throw error
   }
 }
+
+export interface CreateClubData {
+  name: string
+}
+
+export interface CreateClubResponse {
+  message: string
+  club: Club
+}
+
+export async function createClub(data: CreateClubData): Promise<CreateClubResponse> {
+  try {
+    const response = await api.post<CreateClubResponse>('clubs', data, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Create club error')
+    throw error
+  }
+}

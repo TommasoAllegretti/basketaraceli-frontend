@@ -9,6 +9,7 @@ import { TeamCreate } from './pages/TeamCreate'
 import { TeamEdit } from './pages/TeamEdit'
 import { Clubs } from './pages/Clubs'
 import { Club } from './pages/Club'
+import { ClubCreate } from './pages/ClubCreate'
 import { Leagues } from './pages/Leagues'
 import { LeagueCreate } from './pages/LeagueCreate'
 // import Dashboard from './pages/Dashboard'
@@ -43,6 +44,7 @@ function App() {
                     <Route path="/edit-team" element={<TeamEdit />} />
                     <Route path="/clubs" element={<Clubs />} />
                     <Route path="/club" element={<Club />} />
+                    <Route path="/create-club" element={<ClubCreate />} />
                     <Route path="/leagues" element={<Leagues />} />
                     <Route path="/create-league" element={<LeagueCreate />} />
                   </Routes>

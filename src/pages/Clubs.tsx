@@ -182,7 +182,7 @@ export function Clubs() {
         </div>
         {isAdmin && (
           <Button className="cursor-pointer" onClick={() => navigate('/create-club')}>
-            Agguingi società
+            Aggiungi Società
           </Button>
         )}
       </div>
