@@ -225,7 +225,12 @@ export function Leagues() {
                   Vedi
                 </Button>
                 {isAdmin && (
-                  <Button size="sm" variant="outline" className="flex-1 cursor-pointer">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 cursor-pointer"
+                    onClick={() => navigate(`/edit-league?id=${league.id}`)}
+                  >
                     Modifica
                   </Button>
                 )}
