@@ -225,8 +225,13 @@ export function Clubs() {
                   Vedi
                 </Button>
                 {isAdmin && (
-                  <Button size="sm" variant="outline" className="flex-1 cursor-pointer">
-                    Edit
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 cursor-pointer"
+                    onClick={() => navigate(`/edit-club?id=${club.id}`)}
+                  >
+                    Modifica
                   </Button>
                 )}
               </div>

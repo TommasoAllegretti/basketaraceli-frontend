@@ -4,11 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Building, ArrowLeft, Calendar, Hash, AlertCircle } from 'lucide-react'
 import { getClub } from '@/api/clubService'
+import { useAuth } from '@/contexts/AuthContext'
 import type { Club as ClubType } from '@/models/club'
 
 export function Club() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { isAdmin } = useAuth()
   const clubId = searchParams.get('id')
 
   const [club, setClub] = useState<ClubType | null>(null)
@@ -283,7 +285,11 @@ export function Club() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <Button variant="outline">Modifica Società</Button>
+            {isAdmin && (
+              <Button variant="outline" onClick={() => navigate(`/edit-club?id=${club.id}`)}>
+                Modifica Società
+              </Button>
+            )}
             <Button variant="outline">Gestisci Squadre</Button>
             <Button variant="outline">Visualizza Statistiche</Button>
             <Button variant="outline">Esporta Dati</Button>

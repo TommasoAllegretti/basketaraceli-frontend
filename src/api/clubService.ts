@@ -55,3 +55,28 @@ export async function createClub(data: CreateClubData): Promise<CreateClubRespon
     throw error
   }
 }
+
+export interface UpdateClubData {
+  name: string
+}
+
+export interface UpdateClubResponse {
+  message: string
+  club: Club
+}
+
+export async function updateClub(id: number, data: UpdateClubData): Promise<UpdateClubResponse> {
+  try {
+    const response = await api.put<UpdateClubResponse>(`clubs/${id}`, data, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Update club error')
+    throw error
+  }
+}
