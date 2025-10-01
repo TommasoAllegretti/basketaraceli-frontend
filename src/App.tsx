@@ -19,6 +19,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import { ThemeProvider } from './components/theme-provider'
 import { AuthProvider } from './contexts/AuthContext'
 import { LeagueEdit } from './pages/LeagueEdit'
+import { League } from './pages/League'
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
                     <Route path="/create-club" element={<ClubCreate />} />
                     <Route path="/edit-club" element={<ClubEdit />} />
                     <Route path="/leagues" element={<Leagues />} />
+                    <Route path="/league" element={<League />} />
                     <Route path="/create-league" element={<LeagueCreate />} />
                     <Route path="/edit-league" element={<LeagueEdit />} />
                   </Routes>
