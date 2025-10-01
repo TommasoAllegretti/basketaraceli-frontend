@@ -157,15 +157,21 @@ export function Clubs() {
   if (!loading && allClubs.length === 0) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Clubs</h1>
-          <p className="text-muted-foreground">Manage and view all clubs</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Società</h1>
+          </div>
+          {isAdmin && (
+            <Button className="cursor-pointer" onClick={() => navigate('/create-club')}>
+              Aggiungi Società
+            </Button>
+          )}
         </div>
         <Card>
           <CardContent className="p-6">
             <div className="text-center">
               <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No clubs found</p>
+              <p className="text-muted-foreground">Nessuna società trovata</p>
             </div>
           </CardContent>
         </Card>

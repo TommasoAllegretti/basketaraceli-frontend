@@ -157,9 +157,15 @@ export function Leagues() {
   if (!loading && allLeagues.length === 0) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Campionati</h1>
-          <p className="text-muted-foreground">Gestisci e visualizza tutti i campionati</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Campionati</h1>
+          </div>
+          {isAdmin && (
+            <Button className="cursor-pointer" onClick={() => navigate('/create-league')}>
+              Aggiungi Campionato
+            </Button>
+          )}
         </div>
         <Card>
           <CardContent className="p-6">

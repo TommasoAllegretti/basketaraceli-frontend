@@ -149,9 +149,15 @@ export function Teams() {
   if (!loading && allTeams.length === 0) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Squadre</h1>
-          <p className="text-muted-foreground">Vedi tutte le squadre</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Squadre</h1>
+          </div>
+          {isAdmin && (
+            <Button className="cursor-pointer" onClick={() => navigate('/create-team')}>
+              Aggiungi Squadra
+            </Button>
+          )}
         </div>
         <Card>
           <CardContent className="p-6">

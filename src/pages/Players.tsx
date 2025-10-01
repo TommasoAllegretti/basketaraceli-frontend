@@ -149,9 +149,15 @@ export function Players() {
   if (!loading && allPlayers.length === 0) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Giocatori</h1>
-          <p className="text-muted-foreground">Vedi tutti i giocatori</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Giocatori</h1>
+          </div>
+          {isAdmin && (
+            <Button className="cursor-pointer" onClick={() => navigate('/create-player')}>
+              Aggiungi Giocatore
+            </Button>
+          )}
         </div>
         <Card>
           <CardContent className="p-6">
