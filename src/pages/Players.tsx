@@ -238,11 +238,16 @@ export function Players() {
                   size="sm"
                   variant="outline"
                   className="flex-1 cursor-pointer"
-                  onClick={() => (window.location.href = `/admin/player?id=${player.id}`)}
+                  onClick={() => navigate(`/player?id=${player.id}`)}
                 >
                   Vedi
                 </Button>
-                <Button size="sm" variant="outline" className="flex-1 cursor-pointer">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1 cursor-pointer"
+                  onClick={() => navigate(`/edit-player?id=${player.id}`)}
+                >
                   Modifica
                 </Button>
               </div>

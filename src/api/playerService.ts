@@ -59,3 +59,32 @@ export async function createPlayer(data: CreatePlayerData): Promise<CreatePlayer
     throw error
   }
 }
+
+export interface UpdatePlayerData {
+  name: string
+  position: string
+  height_cm: number
+  birth_date: string
+  jersey_number: number
+}
+
+export interface UpdatePlayerResponse {
+  message: string
+  player: Player
+}
+
+export async function updatePlayer(id: number, data: UpdatePlayerData): Promise<UpdatePlayerResponse> {
+  try {
+    const response = await api.put<UpdatePlayerResponse>(`players/${id}`, data, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Update player error')
+    throw error
+  }
+}

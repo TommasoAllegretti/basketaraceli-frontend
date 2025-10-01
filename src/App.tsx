@@ -21,6 +21,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { LeagueEdit } from './pages/LeagueEdit'
 import { League } from './pages/League'
 import { PlayerCreate } from './pages/PlayerCreate'
+import { PlayerEdit } from './pages/PlayerEdit'
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
                     <Route path="/players" element={<Players />} />
                     <Route path="/player" element={<Player />} />
                     <Route path="/create-player" element={<PlayerCreate />} />
+                    <Route path="/edit-player" element={<PlayerEdit />} />
                     <Route path="/teams" element={<Teams />} />
                     <Route path="/team" element={<Team />} />
                     <Route path="/create-team" element={<TeamCreate />} />
