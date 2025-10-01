@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Trophy, ArrowLeft, Calendar, Hash, AlertCircle } from 'lucide-react'
-import { getLeague } from '@/api/leagueService'
+import { Trophy, ArrowLeft, Calendar, Hash, AlertCircle, Trash2 } from 'lucide-react'
+import { getLeague, deleteLeague } from '@/api/leagueService'
 import { useAuth } from '@/contexts/AuthContext'
 import type { League as LeagueType } from '@/models/league'
 
@@ -16,6 +16,8 @@ export function League() {
   const [league, setLeague] = useState<LeagueType | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const fetchLeague = async (id: number) => {
     try {
@@ -58,6 +60,22 @@ export function League() {
       month: 'long',
       day: 'numeric',
     })
+  }
+
+  const handleDelete = async () => {
+    if (!league) return
+
+    try {
+      setDeleteLoading(true)
+      await deleteLeague(league.id)
+      navigate('/leagues')
+    } catch (err: any) {
+      console.error("Errore nell'eliminazione della lega:", err)
+      setError('Impossibile eliminare la lega. Riprova più tardi.')
+    } finally {
+      setDeleteLoading(false)
+      setShowDeleteConfirm(false)
+    }
   }
 
   if (loading) {
@@ -246,15 +264,60 @@ export function League() {
           <CardTitle>Azioni Disponibili</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             {isAdmin && (
-              <Button variant="outline" onClick={() => navigate(`/edit-league?id=${league.id}`)}>
-                Modifica Lega
-              </Button>
+              <>
+                <Button variant="outline" onClick={() => navigate(`/edit-league?id=${league.id}`)}>
+                  Modifica Lega
+                </Button>
+                <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} disabled={deleteLoading}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Elimina
+                </Button>
+              </>
             )}
+            <Button variant="outline">Gestisci Squadre</Button>
+            <Button variant="outline">Visualizza Statistiche</Button>
+            <Button variant="outline">Esporta Dati</Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Conferma Eliminazione */}
+      {showDeleteConfirm && (
+        <Card className="border-red-200">
+          <CardHeader>
+            <CardTitle className="text-red-600 flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Conferma Eliminazione
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Sei sicuro di voler eliminare la lega <strong>{league.name}</strong>? Questa azione non può essere
+              annullata e eliminerà anche tutte le squadre associate.
+            </p>
+            <div className="flex gap-4">
+              <Button variant="destructive" onClick={handleDelete} disabled={deleteLoading}>
+                {deleteLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Eliminazione...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Elimina Definitivamente
+                  </>
+                )}
+              </Button>
+              <Button variant="outline" onClick={() => setShowDeleteConfirm(false)} disabled={deleteLoading}>
+                Annulla
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

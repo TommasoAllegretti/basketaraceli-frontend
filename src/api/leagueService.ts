@@ -80,3 +80,22 @@ export async function updateLeague(id: number, data: UpdateLeagueData): Promise<
     throw error
   }
 }
+
+export interface DeleteLeagueResponse {
+  message: string
+}
+
+export async function deleteLeague(id: number): Promise<DeleteLeagueResponse> {
+  try {
+    const response = await api.delete<DeleteLeagueResponse>(`leagues/${id}`, {
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Delete league error')
+    throw error
+  }
+}

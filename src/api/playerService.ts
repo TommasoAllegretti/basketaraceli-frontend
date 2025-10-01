@@ -88,3 +88,22 @@ export async function updatePlayer(id: number, data: UpdatePlayerData): Promise<
     throw error
   }
 }
+
+export interface DeletePlayerResponse {
+  message: string
+}
+
+export async function deletePlayer(id: number): Promise<DeletePlayerResponse> {
+  try {
+    const response = await api.delete<DeletePlayerResponse>(`players/${id}`, {
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Delete player error')
+    throw error
+  }
+}

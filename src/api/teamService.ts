@@ -84,3 +84,22 @@ export async function updateTeam(id: number, data: UpdateTeamData): Promise<Upda
     throw error
   }
 }
+
+export interface DeleteTeamResponse {
+  message: string
+}
+
+export async function deleteTeam(id: number): Promise<DeleteTeamResponse> {
+  try {
+    const response = await api.delete<DeleteTeamResponse>(`teams/${id}`, {
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Delete team error')
+    throw error
+  }
+}

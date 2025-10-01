@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Shield, ArrowLeft, Calendar, Trophy, Building, Users, Ruler } from 'lucide-react'
-import { getTeam } from '@/api/teamService'
+import { Shield, ArrowLeft, Calendar, Trophy, Building, Users, Ruler, Trash2, AlertCircle } from 'lucide-react'
+import { getTeam, deleteTeam } from '@/api/teamService'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Team as TeamType } from '@/models/team'
 
@@ -16,6 +16,8 @@ export function Team() {
   const [team, setTeam] = useState<TeamType | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const fetchTeam = async (id: number) => {
     try {
@@ -73,6 +75,22 @@ export function Team() {
     }
 
     return age
+  }
+
+  const handleDelete = async () => {
+    if (!team) return
+
+    try {
+      setDeleteLoading(true)
+      await deleteTeam(team.id)
+      navigate('/teams')
+    } catch (err: any) {
+      console.error("Errore nell'eliminazione della squadra:", err)
+      setError('Impossibile eliminare la squadra. Riprova più tardi.')
+    } finally {
+      setDeleteLoading(false)
+      setShowDeleteConfirm(false)
+    }
   }
 
   if (loading) {
@@ -341,20 +359,62 @@ export function Team() {
       {/* Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>Actions</CardTitle>
+          <CardTitle>Azioni Disponibili</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             {isAdmin && (
-              <Button variant="outline" onClick={() => navigate(`/edit-team?id=${team.id}`)}>
-                Edit Team
-              </Button>
+              <>
+                <Button variant="outline" onClick={() => navigate(`/edit-team?id=${team.id}`)}>
+                  Modifica Squadra
+                </Button>
+                <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} disabled={deleteLoading}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Elimina
+                </Button>
+              </>
             )}
-            <Button variant="outline">Manage Players</Button>
-            <Button variant="outline">View Statistics</Button>
+            <Button variant="outline">Gestisci Giocatori</Button>
+            <Button variant="outline">Visualizza Statistiche</Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Conferma Eliminazione */}
+      {showDeleteConfirm && (
+        <Card className="border-red-200">
+          <CardHeader>
+            <CardTitle className="text-red-600 flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Conferma Eliminazione
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Sei sicuro di voler eliminare la squadra <strong>{team.name}</strong>? Questa azione non può essere
+              annullata e rimuoverà tutti i giocatori associati.
+            </p>
+            <div className="flex gap-4">
+              <Button variant="destructive" onClick={handleDelete} disabled={deleteLoading}>
+                {deleteLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Eliminazione...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Elimina Definitivamente
+                  </>
+                )}
+              </Button>
+              <Button variant="outline" onClick={() => setShowDeleteConfirm(false)} disabled={deleteLoading}>
+                Annulla
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

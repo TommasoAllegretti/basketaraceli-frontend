@@ -80,3 +80,22 @@ export async function updateClub(id: number, data: UpdateClubData): Promise<Upda
     throw error
   }
 }
+
+export interface DeleteClubResponse {
+  message: string
+}
+
+export async function deleteClub(id: number): Promise<DeleteClubResponse> {
+  try {
+    const response = await api.delete<DeleteClubResponse>(`clubs/${id}`, {
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Delete club error')
+    throw error
+  }
+}
