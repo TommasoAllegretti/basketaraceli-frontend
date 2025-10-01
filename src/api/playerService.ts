@@ -30,3 +30,32 @@ export async function getPlayer(id: number): Promise<Player> {
     throw error
   }
 }
+
+export interface CreatePlayerData {
+  name: string
+  position: string
+  height_cm: number
+  birth_date: string
+  jersey_number: number
+}
+
+export interface CreatePlayerResponse {
+  message: string
+  player: Player
+}
+
+export async function createPlayer(data: CreatePlayerData): Promise<CreatePlayerResponse> {
+  try {
+    const response = await api.post<CreatePlayerResponse>('players', data, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return response.data
+  } catch (error: unknown) {
+    console.error('Create player error')
+    throw error
+  }
+}

@@ -20,6 +20,7 @@ import { ThemeProvider } from './components/theme-provider'
 import { AuthProvider } from './contexts/AuthContext'
 import { LeagueEdit } from './pages/LeagueEdit'
 import { League } from './pages/League'
+import { PlayerCreate } from './pages/PlayerCreate'
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/players" element={<Players />} />
                     <Route path="/player" element={<Player />} />
+                    <Route path="/create-player" element={<PlayerCreate />} />
                     <Route path="/teams" element={<Teams />} />
                     <Route path="/team" element={<Team />} />
                     <Route path="/create-team" element={<TeamCreate />} />

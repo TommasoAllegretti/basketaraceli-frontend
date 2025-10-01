@@ -5,9 +5,11 @@ import { Users, ChevronLeft, ChevronRight, Trophy, Hash, Ruler } from 'lucide-re
 import { getPlayers } from '@/api/playerService'
 import type { Player } from '@/models/player'
 import { useAuth } from '@/contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 export function Players() {
   const { isAdmin } = useAuth()
+  const navigate = useNavigate()
   const [allPlayers, setAllPlayers] = useState<Player[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -170,7 +172,11 @@ export function Players() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Giocatori</h1>
         </div>
-        {isAdmin && <Button className="cursor-pointer">Aggiungi Giocatore</Button>}
+        {isAdmin && (
+          <Button className="cursor-pointer" onClick={() => navigate('/create-player')}>
+            Aggiungi Giocatore
+          </Button>
+        )}
       </div>
 
       {/* Players Grid */}
