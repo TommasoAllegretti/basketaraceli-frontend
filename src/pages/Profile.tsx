@@ -145,22 +145,22 @@ export function Profile() {
               <p className="text-sm font-medium">User ID</p>
               <p className="text-sm text-muted-foreground">#{user.id}</p>
             </div>
-
-            <div>
-              <p className="text-sm font-medium">Player ID</p>
-              <p
-                className="text-sm underline hover:no-underline cursor-pointer text-blue-500"
-                onClick={() => (window.location.href = `/admin/player?id=${user.player_id}`)}
-              >
-                #{user.player_id}
-              </p>
-            </div>
-
+            if (user.player_id)
+            {
+              <div>
+                <p className="text-sm font-medium">Player ID</p>
+                <p
+                  className="text-sm underline hover:no-underline cursor-pointer text-blue-500"
+                  onClick={() => (window.location.href = `/admin/player?id=${user.player_id}`)}
+                >
+                  #{user.player_id}
+                </p>
+              </div>
+            }
             <div>
               <p className="text-sm font-medium">Membro da</p>
               <p className="text-sm text-muted-foreground">{formatDate(user.created_at)}</p>
             </div>
-
             <div>
               <p className="text-sm font-medium">Ultimo aggiornamento</p>
               <p className="text-sm text-muted-foreground">{formatDate(user.updated_at)}</p>
