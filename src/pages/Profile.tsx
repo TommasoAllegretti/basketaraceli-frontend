@@ -145,8 +145,7 @@ export function Profile() {
               <p className="text-sm font-medium">User ID</p>
               <p className="text-sm text-muted-foreground">#{user.id}</p>
             </div>
-            if (user.player_id)
-            {
+            {user.player_id && (
               <div>
                 <p className="text-sm font-medium">Player ID</p>
                 <p
@@ -156,7 +155,7 @@ export function Profile() {
                   #{user.player_id}
                 </p>
               </div>
-            }
+            )}
             <div>
               <p className="text-sm font-medium">Membro da</p>
               <p className="text-sm text-muted-foreground">{formatDate(user.created_at)}</p>
