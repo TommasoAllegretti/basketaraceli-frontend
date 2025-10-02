@@ -179,7 +179,7 @@ export function PlayerEdit() {
       setTimeout(() => {
         navigate(`/player?id=${playerId}`)
       }, 2000)
-    } catch (err: unknown) {
+    } catch (err: any) {
       if (err.response?.status === 403) {
         setError('Non autorizzato. Solo gli amministratori possono modificare giocatori.')
       } else if (err.response?.data?.message) {
