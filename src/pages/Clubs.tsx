@@ -205,11 +205,6 @@ export function Clubs() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
-                <Hash className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">ID: #{club.id}</span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Data creazione: {formatDate(club.created_at)}</span>
               </div>

@@ -165,9 +165,6 @@ export function Team() {
           <Shield className="h-8 w-8" />
           {team.name}
         </h1>
-        <p className="text-muted-foreground">
-          Team #{team.id} - {team.abbreviation}
-        </p>
       </div>
 
       {/* Team Information Grid */}
@@ -330,36 +327,10 @@ export function Team() {
         </CardContent>
       </Card>
 
-      {/* Account Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Informazioni
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-3">
-          <div>
-            <p className="text-sm font-medium">Team ID</p>
-            <p className="text-sm text-muted-foreground">#{team.id}</p>
-          </div>
-
-          <div>
-            <p className="text-sm font-medium">Created</p>
-            <p className="text-sm text-muted-foreground">{formatDate(team.created_at)}</p>
-          </div>
-
-          <div>
-            <p className="text-sm font-medium">Last Updated</p>
-            <p className="text-sm text-muted-foreground">{formatDate(team.updated_at)}</p>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>Azioni Disponibili</CardTitle>
+          <CardTitle>Azioni</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 flex-wrap">

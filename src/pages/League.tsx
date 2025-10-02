@@ -29,7 +29,7 @@ export function League() {
       if (err.response?.status === 403) {
         setError('Non autorizzato. Non hai i permessi per visualizzare questa lega.')
       } else if (err.response?.status === 404) {
-        setError('Lega non trovata.')
+        setError('Campionato non trovata.')
       } else {
         setError('Impossibile caricare le informazioni della lega')
       }
@@ -88,7 +88,7 @@ export function League() {
           </Button>
         </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dettagli Lega</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Dettagli Campionato</h1>
         </div>
         <div className="grid gap-6 md:grid-cols-2">
           {Array.from({ length: 2 }).map((_, i) => (
@@ -117,7 +117,7 @@ export function League() {
           </Button>
         </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dettagli Lega</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Dettagli Campionato</h1>
         </div>
         <Card>
           <CardContent className="p-6">
@@ -158,7 +158,7 @@ export function League() {
         </h1>
       </div>
 
-      {/* Griglia Informazioni Lega */}
+      {/* Griglia Informazioni Campionato */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Informazioni Generali */}
         <Card>
@@ -172,7 +172,7 @@ export function League() {
             <div className="flex items-center gap-3">
               <Trophy className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm font-medium">Nome Lega</p>
+                <p className="text-sm font-medium">Nome Campionato</p>
                 <p className="text-sm text-muted-foreground">{league.name}</p>
               </div>
             </div>
@@ -194,48 +194,14 @@ export function League() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Stato Lega */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" />
-              Stato Lega
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm font-medium text-green-800">
-                  {league.deleted_at ? 'Lega Eliminata' : 'Lega Attiva'}
-                </span>
-              </div>
-              <p className="text-xs text-green-600 mt-1">
-                {league.deleted_at
-                  ? `Eliminata il ${formatDate(league.deleted_at)}`
-                  : 'La lega è attualmente attiva nel sistema'}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Informazioni Sistema</p>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p>Creata: {formatDate(league.created_at)}</p>
-                <p>Aggiornata: {formatDate(league.updated_at)}</p>
-                {league.deleted_at && <p>• Eliminata: {formatDate(league.deleted_at)}</p>}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
-      {/* Statistiche Lega */}
+      {/* Statistiche Campionato */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Hash className="h-5 w-5" />
-            Statistiche Lega
+            Statistiche Campionato
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -261,14 +227,14 @@ export function League() {
       {/* Azioni */}
       <Card>
         <CardHeader>
-          <CardTitle>Azioni Disponibili</CardTitle>
+          <CardTitle>Azioni</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 flex-wrap">
             {isAdmin && (
               <>
                 <Button variant="outline" onClick={() => navigate(`/edit-league?id=${league.id}`)}>
-                  Modifica Lega
+                  Modifica Campionato
                 </Button>
                 <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} disabled={deleteLoading}>
                   <Trash2 className="h-4 w-4 mr-2" />

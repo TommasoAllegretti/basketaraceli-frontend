@@ -211,7 +211,6 @@ export function Teams() {
                   <span className="text-sm font-medium bg-green-100 text-green-800 px-2 py-1 rounded">
                     {team.league.name}
                   </span>
-                  <span className="text-xs text-muted-foreground">ID: #{team.id}</span>
                 </div>
               </div>
 

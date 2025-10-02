@@ -173,9 +173,6 @@ export function Player() {
           <Users className="h-8 w-8" />
           {player.name}
         </h1>
-        <p className="text-muted-foreground">
-          Player #{player.id} - {player.position}
-        </p>
       </div>
 
       {/* Player Information Grid */}
@@ -301,38 +298,12 @@ export function Player() {
             )}
           </CardContent>
         </Card>
-
-        {/* Account Information */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Account Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-3">
-            <div>
-              <p className="text-sm font-medium">Player ID</p>
-              <p className="text-sm text-muted-foreground">#{player.id}</p>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium">Created</p>
-              <p className="text-sm text-muted-foreground">{formatDate(player.created_at)}</p>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium">Last Updated</p>
-              <p className="text-sm text-muted-foreground">{formatDate(player.updated_at)}</p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>Azioni Disponibili</CardTitle>
+          <CardTitle>Azioni</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 flex-wrap">

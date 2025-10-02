@@ -194,40 +194,6 @@ export function Club() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Stato Società */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" />
-              Stato Società
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm font-medium text-green-800">
-                  {club.deleted_at ? 'Società Eliminata' : 'Società Attiva'}
-                </span>
-              </div>
-              <p className="text-xs text-green-600 mt-1">
-                {club.deleted_at
-                  ? `Eliminata il ${formatDate(club.deleted_at)}`
-                  : 'La società è attualmente attiva nel sistema'}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Informazioni Sistema</p>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>• Creata: {formatDate(club.created_at)}</p>
-                <p>• Aggiornata: {formatDate(club.updated_at)}</p>
-                {club.deleted_at && <p>• Eliminata: {formatDate(club.deleted_at)}</p>}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Statistiche Società */}
@@ -265,41 +231,10 @@ export function Club() {
         </CardContent>
       </Card>
 
-      {/* Informazioni Dettagliate */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Informazioni Dettagliate
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <div>
-            <p className="text-sm font-medium">ID Società</p>
-            <p className="text-sm text-muted-foreground">#{club.id}</p>
-          </div>
-
-          <div>
-            <p className="text-sm font-medium">Nome Completo</p>
-            <p className="text-sm text-muted-foreground">{club.name}</p>
-          </div>
-
-          <div>
-            <p className="text-sm font-medium">Data Registrazione</p>
-            <p className="text-sm text-muted-foreground">{formatDate(club.created_at)}</p>
-          </div>
-
-          <div>
-            <p className="text-sm font-medium">Ultima Modifica</p>
-            <p className="text-sm text-muted-foreground">{formatDate(club.updated_at)}</p>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Azioni */}
       <Card>
         <CardHeader>
-          <CardTitle>Azioni Disponibili</CardTitle>
+          <CardTitle>Azioni</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 flex-wrap">
@@ -316,7 +251,6 @@ export function Club() {
             )}
             <Button variant="outline">Gestisci Squadre</Button>
             <Button variant="outline">Visualizza Statistiche</Button>
-            <Button variant="outline">Esporta Dati</Button>
           </div>
         </CardContent>
       </Card>
