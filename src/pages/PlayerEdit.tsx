@@ -4,10 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User, ArrowLeft, Save, Calendar, Ruler, Hash, AlertCircle } from 'lucide-react'
+import { User, ArrowLeft, Save, Calendar, Ruler, Hash, AlertCircle, Shield, Target } from 'lucide-react'
 import { getPlayer, updatePlayer, type UpdatePlayerData } from '@/api/playerService'
+import { getTeams } from '@/api/teamService'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Player } from '@/models/player'
+import type { Team } from '@/models/team'
 
 export function PlayerEdit() {
   const navigate = useNavigate()
@@ -22,8 +24,13 @@ export function PlayerEdit() {
     height_cm: 0,
     birth_date: '',
     jersey_number: 0,
+    points_per_game: 0,
+    rebounds_per_game: 0,
+    assists_per_game: 0,
+    teams: [],
   })
 
+  const [teams, setTeams] = useState<Team[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -46,17 +53,22 @@ export function PlayerEdit() {
 
       try {
         setDataLoading(true)
-        const playerData = await getPlayer(id)
+        const [playerData, teamsData] = await Promise.all([getPlayer(id), getTeams()])
 
         setPlayer(playerData)
+        setTeams(teamsData)
 
         // Popola il form con i dati esistenti
         setFormData({
           name: playerData.name,
-          position: playerData.position,
-          height_cm: playerData.height_cm,
-          birth_date: playerData.birth_date,
-          jersey_number: playerData.jersey_number,
+          position: playerData.position || '',
+          height_cm: playerData.height_cm || 0,
+          birth_date: playerData.birth_date || '',
+          jersey_number: playerData.jersey_number || 0,
+          points_per_game: parseFloat(playerData.points_per_game) || 0,
+          rebounds_per_game: parseFloat(playerData.rebounds_per_game) || 0,
+          assists_per_game: parseFloat(playerData.assists_per_game) || 0,
+          teams: playerData.teams?.map(team => team.id) || [],
         })
       } catch (err: any) {
         console.error('Errore nel recupero dei dati:', err)
@@ -75,7 +87,7 @@ export function PlayerEdit() {
     fetchData()
   }, [playerId])
 
-  const handleInputChange = (field: keyof UpdatePlayerData, value: string | number) => {
+  const handleInputChange = (field: keyof UpdatePlayerData, value: string | number | number[]) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -85,35 +97,39 @@ export function PlayerEdit() {
     if (success) setSuccess(null)
   }
 
+  const handleTeamToggle = (teamId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      teams: prev.teams?.includes(teamId) ? prev.teams.filter(id => id !== teamId) : [...(prev.teams || []), teamId],
+    }))
+  }
+
   const validateForm = (): string | null => {
     if (!formData.name.trim()) {
       return 'Il nome del giocatore è obbligatorio'
     }
-    if (!formData.position.trim()) {
-      return 'La posizione è obbligatoria'
+
+    // Optional validations for other fields
+    if (formData.birth_date) {
+      const birthDate = new Date(formData.birth_date)
+      const today = new Date()
+      if (birthDate > today) {
+        return 'La data di nascita non può essere nel futuro'
+      }
+
+      const minAge = new Date()
+      minAge.setFullYear(today.getFullYear() - 10)
+      if (birthDate > minAge) {
+        return 'Il giocatore deve avere almeno 10 anni'
+      }
     }
-    if (!formData.birth_date) {
-      return 'La data di nascita è obbligatoria'
-    }
-    if (formData.height_cm <= 0 || formData.height_cm > 300) {
+
+    if (formData.height_cm && (formData.height_cm <= 0 || formData.height_cm > 300)) {
       return "L'altezza deve essere compresa tra 1 e 300 cm"
     }
-    if (formData.jersey_number <= 0 || formData.jersey_number > 99) {
+
+    if (formData.jersey_number && (formData.jersey_number <= 0 || formData.jersey_number > 99)) {
       return 'Il numero di maglia deve essere compreso tra 1 e 99'
-    }
-
-    // Validate birth date is not in the future
-    const birthDate = new Date(formData.birth_date)
-    const today = new Date()
-    if (birthDate > today) {
-      return 'La data di nascita non può essere nel futuro'
-    }
-
-    // Validate minimum age (e.g., 10 years old)
-    const minAge = new Date()
-    minAge.setFullYear(today.getFullYear() - 10)
-    if (birthDate > minAge) {
-      return 'Il giocatore deve avere almeno 10 anni'
     }
 
     return null
@@ -138,13 +154,24 @@ export function PlayerEdit() {
       setError(null)
       setSuccess(null)
 
-      const response = await updatePlayer(parseInt(playerId, 10), {
+      const playerData: UpdatePlayerData = {
         name: formData.name.trim(),
-        position: formData.position.trim(),
-        height_cm: formData.height_cm,
-        birth_date: formData.birth_date,
-        jersey_number: formData.jersey_number,
-      })
+      }
+
+      // Add optional fields only if they have values
+      if (formData.position?.trim()) playerData.position = formData.position.trim()
+      if (formData.height_cm && formData.height_cm > 0) playerData.height_cm = formData.height_cm
+      if (formData.birth_date) playerData.birth_date = formData.birth_date
+      if (formData.jersey_number && formData.jersey_number > 0) playerData.jersey_number = formData.jersey_number
+      if (formData.points_per_game !== undefined && formData.points_per_game >= 0)
+        playerData.points_per_game = formData.points_per_game
+      if (formData.rebounds_per_game !== undefined && formData.rebounds_per_game >= 0)
+        playerData.rebounds_per_game = formData.rebounds_per_game
+      if (formData.assists_per_game !== undefined && formData.assists_per_game >= 0)
+        playerData.assists_per_game = formData.assists_per_game
+      if (formData.teams && formData.teams.length >= 0) playerData.teams = formData.teams
+
+      const response = await updatePlayer(parseInt(playerId, 10), playerData)
 
       setSuccess(response.message || 'Giocatore aggiornato con successo')
 
@@ -152,7 +179,7 @@ export function PlayerEdit() {
       setTimeout(() => {
         navigate(`/player?id=${playerId}`)
       }, 2000)
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err.response?.status === 403) {
         setError('Non autorizzato. Solo gli amministratori possono modificare giocatori.')
       } else if (err.response?.data?.message) {
@@ -330,15 +357,12 @@ export function PlayerEdit() {
 
               {/* Posizione */}
               <div className="space-y-2">
-                <Label htmlFor="position">
-                  Posizione <span className="text-red-500">*</span>
-                </Label>
+                <Label htmlFor="position">Posizione</Label>
                 <select
                   id="position"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   value={formData.position}
                   onChange={e => handleInputChange('position', e.target.value)}
-                  required
                 >
                   <option value="">Seleziona una posizione</option>
                   <option value="Playmaker">Playmaker (PG)</option>
@@ -354,7 +378,7 @@ export function PlayerEdit() {
               <div className="space-y-2">
                 <Label htmlFor="height">
                   <Ruler className="h-4 w-4 inline mr-1" />
-                  Altezza (cm) <span className="text-red-500">*</span>
+                  Altezza (cm)
                 </Label>
                 <Input
                   id="height"
@@ -373,7 +397,7 @@ export function PlayerEdit() {
               <div className="space-y-2">
                 <Label htmlFor="birth_date">
                   <Calendar className="h-4 w-4 inline mr-1" />
-                  Data di Nascita <span className="text-red-500">*</span>
+                  Data di Nascita
                 </Label>
                 <Input
                   id="birth_date"
@@ -392,7 +416,7 @@ export function PlayerEdit() {
               <div className="space-y-2">
                 <Label htmlFor="jersey_number">
                   <Hash className="h-4 w-4 inline mr-1" />
-                  Numero di Maglia <span className="text-red-500">*</span>
+                  Numero di Maglia
                 </Label>
                 <Input
                   id="jersey_number"
@@ -402,9 +426,98 @@ export function PlayerEdit() {
                   onChange={e => handleInputChange('jersey_number', parseInt(e.target.value) || 0)}
                   min="1"
                   max="99"
-                  required
                 />
                 <p className="text-sm text-muted-foreground">Numero di maglia del giocatore (1-99)</p>
+              </div>
+
+              {/* Statistiche */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Statistiche (Opzionali)
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Punti per Partita */}
+                  <div className="space-y-2">
+                    <Label htmlFor="points_per_game">Punti per Partita</Label>
+                    <Input
+                      id="points_per_game"
+                      type="number"
+                      step="0.1"
+                      placeholder="es. 15.5"
+                      value={formData.points_per_game || ''}
+                      onChange={e => handleInputChange('points_per_game', parseFloat(e.target.value) || 0)}
+                      min="0"
+                    />
+                  </div>
+
+                  {/* Rimbalzi per Partita */}
+                  <div className="space-y-2">
+                    <Label htmlFor="rebounds_per_game">Rimbalzi per Partita</Label>
+                    <Input
+                      id="rebounds_per_game"
+                      type="number"
+                      step="0.1"
+                      placeholder="es. 5.2"
+                      value={formData.rebounds_per_game || ''}
+                      onChange={e => handleInputChange('rebounds_per_game', parseFloat(e.target.value) || 0)}
+                      min="0"
+                    />
+                  </div>
+
+                  {/* Assist per Partita */}
+                  <div className="space-y-2">
+                    <Label htmlFor="assists_per_game">Assist per Partita</Label>
+                    <Input
+                      id="assists_per_game"
+                      type="number"
+                      step="0.1"
+                      placeholder="es. 4.8"
+                      value={formData.assists_per_game || ''}
+                      onChange={e => handleInputChange('assists_per_game', parseFloat(e.target.value) || 0)}
+                      min="0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Squadre */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Squadre Associate (Opzionale)
+                </h3>
+
+                {teams.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto border rounded-md p-3">
+                    {teams.map(team => (
+                      <label
+                        key={team.id}
+                        className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.teams?.includes(team.id) || false}
+                          onChange={() => handleTeamToggle(team.id)}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <div className="flex-1">
+                          <div className="text-sm font-medium">{team.name}</div>
+                          <div className="text-xs text-gray-500">
+                            {team.club?.name} - {team.league?.name}
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Nessuna squadra disponibile</p>
+                )}
+
+                {formData.teams && formData.teams.length > 0 && (
+                  <p className="text-sm text-muted-foreground">{formData.teams.length} squadra/e selezionata/e</p>
+                )}
               </div>
 
               {/* Messaggio di Errore */}
@@ -424,18 +537,7 @@ export function PlayerEdit() {
 
               {/* Pulsanti */}
               <div className="flex gap-4">
-                <Button
-                  type="submit"
-                  disabled={
-                    loading ||
-                    !formData.name.trim() ||
-                    !formData.position.trim() ||
-                    !formData.birth_date ||
-                    formData.height_cm <= 0 ||
-                    formData.jersey_number <= 0
-                  }
-                  className="flex-1"
-                >
+                <Button type="submit" disabled={loading || !formData.name.trim()} className="flex-1">
                   {loading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -464,19 +566,25 @@ export function PlayerEdit() {
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-2">
             <p>
-              <strong>Nome:</strong> Nome completo del giocatore (nome e cognome)
+              <strong>Nome:</strong> Nome completo del giocatore (obbligatorio)
             </p>
             <p>
-              <strong>Posizione:</strong> Ruolo principale del giocatore in campo
+              <strong>Posizione:</strong> Ruolo principale del giocatore in campo (opzionale)
             </p>
             <p>
-              <strong>Altezza:</strong> Altezza in centimetri, deve essere realistica (100-300 cm)
+              <strong>Altezza:</strong> Altezza in centimetri, deve essere realistica (100-300 cm, opzionale)
             </p>
             <p>
-              <strong>Data di Nascita:</strong> Il giocatore deve avere almeno 10 anni
+              <strong>Data di Nascita:</strong> Il giocatore deve avere almeno 10 anni (opzionale)
             </p>
             <p>
-              <strong>Numero di Maglia:</strong> Numero per identificare il giocatore (1-99)
+              <strong>Numero di Maglia:</strong> Numero per identificare il giocatore (1-99, opzionale)
+            </p>
+            <p>
+              <strong>Statistiche:</strong> Punti, rimbalzi e assist per partita (opzionali)
+            </p>
+            <p>
+              <strong>Squadre:</strong> Modifica le squadre associate al giocatore (opzionale)
             </p>
             <p>
               <strong>Nota:</strong> Solo gli amministratori possono modificare giocatori

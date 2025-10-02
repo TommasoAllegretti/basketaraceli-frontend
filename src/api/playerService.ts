@@ -33,10 +33,14 @@ export async function getPlayer(id: number): Promise<Player> {
 
 export interface CreatePlayerData {
   name: string
-  position: string
-  height_cm: number
-  birth_date: string
-  jersey_number: number
+  position?: string
+  height_cm?: number
+  birth_date?: string
+  jersey_number?: number
+  points_per_game?: number
+  rebounds_per_game?: number
+  assists_per_game?: number
+  teams?: number[]
 }
 
 export interface CreatePlayerResponse {
@@ -62,10 +66,14 @@ export async function createPlayer(data: CreatePlayerData): Promise<CreatePlayer
 
 export interface UpdatePlayerData {
   name: string
-  position: string
-  height_cm: number
-  birth_date: string
-  jersey_number: number
+  position?: string
+  height_cm?: number
+  birth_date?: string
+  jersey_number?: number
+  points_per_game?: number
+  rebounds_per_game?: number
+  assists_per_game?: number
+  teams?: number[]
 }
 
 export interface UpdatePlayerResponse {
