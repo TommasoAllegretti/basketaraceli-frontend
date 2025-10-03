@@ -1,102 +1,201 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Users, TrendingUp, DollarSign } from 'lucide-react'
+import {
+  Users,
+  Trophy,
+  BarChart3,
+  Calendar,
+  Shield,
+  Target,
+  Plus,
+  Eye,
+  UserPlus,
+  CalendarPlus,
+  TrendingUp,
+} from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 export function Home() {
+  const navigate = useNavigate()
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Here's what's happening today.</p>
+        <p className="text-muted-foreground">Gestisci squadre, giocatori e partite.</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-        <Card>
+      {/* Navigation Cards */}
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
+        <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/teams')}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              Total Revenue
+              <Shield className="h-4 w-4 text-blue-600" />
+              Squadre
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,231</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <p className="text-sm text-muted-foreground">Gestisci e visualizza tutte le squadre</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/players')}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Active Users
+              <Users className="h-4 w-4 text-green-600" />
+              Giocatori
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2,350</div>
-            <p className="text-xs text-muted-foreground">+18% from last month</p>
+            <p className="text-sm text-muted-foreground">Gestisci e visualizza tutti i giocatori</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/games')}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Sales
+              <Calendar className="h-4 w-4 text-orange-600" />
+              Partite
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12,234</div>
-            <p className="text-xs text-muted-foreground">+19% from last month</p>
+            <p className="text-sm text-muted-foreground">Visualizza e programma le partite</p>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/game-stats')}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-purple-600" />
+              Statistiche
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Visualizza statistiche delle partite</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Content Cards */}
+      {/* Action Cards */}
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        {/* Teams Management */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-blue-600" />
+              Gestione Squadre
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/teams')}>
+              <Eye className="h-4 w-4 mr-2" />
+              Visualizza Squadre
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/team-create')}>
+              <Plus className="h-4 w-4 mr-2" />
+              Crea Nuova Squadra
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/clubs')}>
+              <Trophy className="h-4 w-4 mr-2" />
+              Gestisci Società
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Players Management */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-green-600" />
+              Gestione Giocatori
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/players')}>
+              <Eye className="h-4 w-4 mr-2" />
+              Visualizza Giocatori
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/player-create')}>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Aggiungi Giocatore
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/leagues')}>
+              <Trophy className="h-4 w-4 mr-2" />
+              Gestisci Campionati
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Games & Statistics */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-orange-600" />
+              Partite & Statistiche
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/games')}>
+              <Eye className="h-4 w-4 mr-2" />
+              Visualizza Partite
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/game-create')}>
+              <CalendarPlus className="h-4 w-4 mr-2" />
+              Programma Partita
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/game-stats')}>
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Statistiche Partite
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Navigation */}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5" />
+              Organizzazione
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Payment received</p>
-                <p className="text-xs text-muted-foreground">2 minutes ago</p>
-              </div>
-              <span className="text-sm font-medium text-green-600">+$1,999</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">New user registered</p>
-                <p className="text-xs text-muted-foreground">5 minutes ago</p>
-              </div>
-              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">New</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">System update</p>
-                <p className="text-xs text-muted-foreground">1 hour ago</p>
-              </div>
-              <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">v2.1.0</span>
-            </div>
+          <CardContent className="space-y-2">
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/clubs')}>
+              <Shield className="h-4 w-4 mr-2" />
+              Gestisci Società
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/leagues')}>
+              <Trophy className="h-4 w-4 mr-2" />
+              Gestisci Campionati
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/club-create')}>
+              <Plus className="h-4 w-4 mr-2" />
+              Crea Nuova Società
+            </Button>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Azioni</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Azioni Rapide
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button className="w-full justify-start" variant="outline">
-              Create New Project
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/game-stat-create')}>
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Inserisci Statistiche
             </Button>
-            <Button className="w-full justify-start" variant="outline">
-              View Reports
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/profile')}>
+              <Users className="h-4 w-4 mr-2" />
+              Il Mio Profilo
             </Button>
-            <Button className="w-full justify-start" variant="outline">
-              Gestisci Utenti
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/league-create')}>
+              <Plus className="h-4 w-4 mr-2" />
+              Crea Nuova Lega
             </Button>
           </CardContent>
         </Card>
