@@ -22,6 +22,8 @@ import { LeagueEdit } from './pages/LeagueEdit'
 import { League } from './pages/League'
 import { PlayerCreate } from './pages/PlayerCreate'
 import { PlayerEdit } from './pages/PlayerEdit'
+import { ForgotPassword } from './pages/ForgotPassword'
+import { ResetPassword } from './pages/ResetPassword'
 
 function App() {
   return (
@@ -29,8 +31,10 @@ function App() {
       <AuthProvider>
         <BrowserRouter basename="/admin">
           <Routes>
-            {/* Public Route */}
+            {/* Public Routes */}
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Protected Routes */}
             <Route
