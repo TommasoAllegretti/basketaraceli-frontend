@@ -188,58 +188,61 @@ export function Players() {
       {/* Players Grid */}
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {currentPlayers.map((player: Player) => (
-          <Card key={player.id} className="hover:shadow-md transition-shadow">
+          <Card key={player.id} className="hover:shadow-md transition-shadow flex flex-col">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Users className="h-5 w-5" />
                 {player.name}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Hash className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">#{player.jersey_number}</span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm">
-                <Trophy className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{player.position}</span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm">
-                <Ruler className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{player.height_cm} cm</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 pt-2 text-xs">
-                <div className="text-center" title="punti a partita">
-                  <div className="text-muted-foreground">PPG</div>
-                  <div className="font-medium">{player.points_per_game}</div>
+            <CardContent className="flex flex-col flex-1">
+              <div className="space-y-3 flex-1">
+                <div className="flex items-center gap-2 text-sm">
+                  <Hash className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">#{player.jersey_number}</span>
                 </div>
-                <div className="text-center" title="rimbalzi a partita">
-                  <div className="text-muted-foreground">RPG</div>
-                  <div className="font-medium">{player.rebounds_per_game}</div>
-                </div>
-                <div className="text-center" title="assist a partita">
-                  <div className="text-muted-foreground">APG</div>
-                  <div className="font-medium">{player.assists_per_game}</div>
-                </div>
-              </div>
 
-              {player.teams.length > 0 && (
-                <div className="pt-2">
-                  <div className="text-xs text-muted-foreground mb-1">Squadre:</div>
-                  <div className="flex flex-wrap gap-1">
-                    {player.teams.map(team => (
-                      <span key={team.id} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                        {team.abbreviation}
-                      </span>
-                    ))}
+                <div className="flex items-center gap-2 text-sm">
+                  <Trophy className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">{player.position}</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm">
+                  <Ruler className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">{player.height_cm} cm</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 pt-2 text-xs">
+                  <div className="text-center" title="punti a partita">
+                    <div className="text-muted-foreground">PPG</div>
+                    <div className="font-medium">{player.points_per_game}</div>
+                  </div>
+                  <div className="text-center" title="rimbalzi a partita">
+                    <div className="text-muted-foreground">RPG</div>
+                    <div className="font-medium">{player.rebounds_per_game}</div>
+                  </div>
+                  <div className="text-center" title="assist a partita">
+                    <div className="text-muted-foreground">APG</div>
+                    <div className="font-medium">{player.assists_per_game}</div>
                   </div>
                 </div>
-              )}
 
-              <div className="flex gap-2 pt-2">
+                {player.teams.length > 0 && (
+                  <div className="pt-2">
+                    <div className="text-xs text-muted-foreground mb-1">Squadre:</div>
+                    <div className="flex flex-wrap gap-1">
+                      {player.teams.map(team => (
+                        <span key={team.id} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          {team.abbreviation}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Buttons always at bottom */}
+              <div className="flex gap-2 pt-4 mt-auto">
                 <Button
                   size="sm"
                   variant="outline"

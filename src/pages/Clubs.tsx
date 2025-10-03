@@ -196,27 +196,30 @@ export function Clubs() {
       {/* Clubs Grid */}
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {currentClubs.map((club: Club) => (
-          <Card key={club.id} className="hover:shadow-md transition-shadow">
+          <Card key={club.id} className="hover:shadow-md transition-shadow flex flex-col">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Building className="h-5 w-5" />
                 {club.name}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Data creazione: {formatDate(club.created_at)}</span>
-              </div>
-
-              {club.updated_at !== club.created_at && (
+            <CardContent className="flex flex-col flex-1">
+              <div className="space-y-3 flex-1">
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Ultimo aggiornamento: {formatDate(club.updated_at)}</span>
+                  <span className="text-muted-foreground">Data creazione: {formatDate(club.created_at)}</span>
                 </div>
-              )}
 
-              <div className="flex gap-2 pt-2">
+                {club.updated_at !== club.created_at && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Ultimo aggiornamento: {formatDate(club.updated_at)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Buttons always at bottom */}
+              <div className="flex gap-2 pt-4 mt-auto">
                 <Button
                   size="sm"
                   variant="outline"

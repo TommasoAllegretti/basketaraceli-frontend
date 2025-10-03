@@ -188,37 +188,40 @@ export function Teams() {
       {/* Teams Grid */}
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {currentTeams.map((team: Team) => (
-          <Card key={team.id} className="hover:shadow-md transition-shadow">
+          <Card key={team.id} className="hover:shadow-md transition-shadow flex flex-col">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Shield className="h-5 w-5" />
                 {team.name}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Trophy className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{team.abbreviation ?? '-'}</span>
-              </div>
+            <CardContent className="flex flex-col flex-1">
+              <div className="space-y-3 flex-1">
+                <div className="flex items-center gap-2 text-sm">
+                  <Trophy className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">{team.abbreviation ?? '-'}</span>
+                </div>
 
-              <div className="flex items-center gap-2 text-sm">
-                <Building className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{team.club?.name ?? '-'}</span>
-              </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Building className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">{team.club?.name ?? '-'}</span>
+                </div>
 
-              <div className="pt-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium bg-green-100 text-green-800 px-2 py-1 rounded">
-                    {team.league.name}
-                  </span>
+                <div className="pt-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium bg-green-100 text-green-800 px-2 py-1 rounded">
+                      {team.league.name}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-xs text-muted-foreground pt-2">
+                  <p>Creato: {new Date(team.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
 
-              <div className="text-xs text-muted-foreground pt-2">
-                <p>Creato: {new Date(team.created_at).toLocaleDateString()}</p>
-              </div>
-
-              <div className="flex gap-2 pt-2">
+              {/* Buttons always at bottom */}
+              <div className="flex gap-2 pt-4 mt-auto">
                 <Button
                   size="sm"
                   variant="outline"
