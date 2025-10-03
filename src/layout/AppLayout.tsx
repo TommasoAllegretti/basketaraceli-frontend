@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +15,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, Settings, User, LogOut, Users, Shield, Building, Trophy } from 'lucide-react'
+import { Home, Settings, User, LogOut, Users, Shield, Building, Trophy, Calendar, BarChart3 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface AppLayoutProps {
@@ -23,6 +24,11 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const { logout } = useAuth()
+  const location = useLocation()
+
+  const isActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(path + '/')
+  }
 
   return (
     <SidebarProvider>
@@ -42,7 +48,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={isActive('/admin/dashboard')}>
                     <a href="/admin/dashboard">
                       <Home />
                       <span>Dashboard</span>
@@ -50,7 +56,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={isActive('/admin/players')}>
                     <a href="/admin/players">
                       <Users />
                       <span>Giocatori</span>
@@ -58,7 +64,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={isActive('/admin/teams')}>
                     <a href="/admin/teams">
                       <Shield />
                       <span>Squadre</span>
@@ -66,7 +72,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={isActive('/admin/clubs')}>
                     <a href="/admin/clubs">
                       <Building />
                       <span>Società</span>
@@ -74,7 +80,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={isActive('/admin/leagues')}>
                     <a href="/admin/leagues">
                       <Trophy />
                       <span>Campionati</span>
@@ -82,7 +88,23 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={isActive('/admin/games')}>
+                    <a href="/admin/games">
+                      <Calendar />
+                      <span>Partite</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isActive('/admin/game-stats')}>
+                    <a href="/admin/game-stats">
+                      <BarChart3 />
+                      <span>Statistiche</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isActive('/admin/profile')}>
                     <a href="/admin/profile">
                       <User />
                       <span>Profilo</span>
@@ -90,7 +112,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={isActive('/admin/settings')}>
                     <a href="/admin/settings">
                       <Settings />
                       <span>Impostazioni</span>

@@ -92,7 +92,7 @@ export function Player() {
       setDeleteLoading(true)
       await deletePlayer(player.id)
       navigate('/players')
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error("Errore nell'eliminazione del giocatore:", err)
       setError('Impossibile eliminare il giocatore. Riprova più tardi.')
     } finally {

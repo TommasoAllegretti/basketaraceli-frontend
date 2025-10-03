@@ -24,6 +24,14 @@ import { PlayerCreate } from './pages/PlayerCreate'
 import { PlayerEdit } from './pages/PlayerEdit'
 import { ForgotPassword } from './pages/ForgotPassword'
 import { ResetPassword } from './pages/ResetPassword'
+import { Games } from './pages/Games'
+import { Game } from './pages/Game'
+import { GameCreate } from './pages/GameCreate'
+import { GameEdit } from './pages/GameEdit'
+import { GameStats } from './pages/GameStats'
+import { GameStat } from './pages/GameStat'
+import { GameStatCreate } from './pages/GameStatCreate'
+import { GameStatEdit } from './pages/GameStatEdit'
 
 function App() {
   return (
@@ -61,6 +69,14 @@ function App() {
                     <Route path="/league" element={<League />} />
                     <Route path="/create-league" element={<LeagueCreate />} />
                     <Route path="/edit-league" element={<LeagueEdit />} />
+                    <Route path="/games" element={<Games />} />
+                    <Route path="/game" element={<Game />} />
+                    <Route path="/create-game" element={<GameCreate />} />
+                    <Route path="/edit-game" element={<GameEdit />} />
+                    <Route path="/game-stats" element={<GameStats />} />
+                    <Route path="/game-stat" element={<GameStat />} />
+                    <Route path="/create-game-stat" element={<GameStatCreate />} />
+                    <Route path="/edit-game-stat" element={<GameStatEdit />} />
                   </Routes>
                 </ProtectedRoute>
               }
