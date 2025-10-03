@@ -125,7 +125,7 @@ export function Club() {
               <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
               <p className="text-red-600 mb-4">{error}</p>
               <div className="flex gap-2 justify-center">
-                <Button onClick={() => clubId && fetchClub(parseInt(clubId, 10))}>Riprova</Button>
+                <Button onClick={() => clubId && fetchClub(parseInt(clubId, 10))}>Ricarica</Button>
                 <Button variant="outline" onClick={() => navigate('/clubs')}>
                   Torna alle Società
                 </Button>

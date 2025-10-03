@@ -23,8 +23,8 @@ export function Teams() {
       const data = await getTeams()
       setAllTeams(data)
     } catch (err) {
-      setError('Failed to load teams')
-      console.error('Error fetching teams:', err)
+      setError('Impossibile caricare le squadre')
+      console.error('Errore nel caricamento delle squadre:', err)
     } finally {
       setLoading(false)
     }
@@ -252,7 +252,7 @@ export function Teams() {
       {/* Pagination Info */}
       {totalPages > 1 && (
         <div className="text-center text-sm text-muted-foreground">
-          Page {currentPage} of {totalPages}
+          Pagina {currentPage} di {totalPages}
         </div>
       )}
     </div>

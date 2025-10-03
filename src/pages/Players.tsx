@@ -23,8 +23,8 @@ export function Players() {
       const data = await getPlayers()
       setAllPlayers(data)
     } catch (err) {
-      setError('Failed to load players')
-      console.error('Error fetching players:', err)
+      setError('Impossibile caricare i giocatori')
+      console.error('Errore nel caricamento dei giocatori:', err)
     } finally {
       setLoading(false)
     }
@@ -273,7 +273,7 @@ export function Players() {
       {/* Pagination Info */}
       {totalPages > 1 && (
         <div className="text-center text-sm text-muted-foreground">
-          Page {currentPage} of {totalPages}
+          Pagina {currentPage} di {totalPages}
         </div>
       )}
     </div>

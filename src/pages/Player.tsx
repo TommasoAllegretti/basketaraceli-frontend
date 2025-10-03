@@ -39,11 +39,11 @@ export function Player() {
       setPlayer(data)
     } catch (err: any) {
       if (err.response?.status === 403) {
-        setError('Unauthorized. You can only view your own player information.')
+        setError('Non autorizzato. Puoi visualizzare solo le tue informazioni giocatore.')
       } else {
-        setError('Failed to load player information')
+        setError('Impossibile caricare le informazioni del giocatore')
       }
-      console.error('Error fetching player:', err)
+      console.error('Errore nel caricamento del giocatore:', err)
     } finally {
       setLoading(false)
     }
@@ -55,11 +55,11 @@ export function Player() {
       if (!isNaN(id)) {
         fetchPlayer(id)
       } else {
-        setError('Invalid player ID')
+        setError('ID giocatore non valido')
         setLoading(false)
       }
     } else {
-      setError('No player ID provided')
+      setError('ID giocatore non fornito')
       setLoading(false)
     }
   }, [playerId])
@@ -282,9 +282,6 @@ export function Player() {
                       </p>
                       <p>
                         <strong>Categoria:</strong> {team.league.name}
-                      </p>
-                      <p>
-                        <strong>Team ID:</strong> #{team.id}
                       </p>
                     </div>
                   </div>

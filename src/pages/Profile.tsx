@@ -17,8 +17,8 @@ export function Profile() {
         const userData = await getCurrentUser()
         setUser(userData)
       } catch (err) {
-        setError('Failed to load user profile')
-        console.error('Error fetching user:', err)
+        setError('Impossibile caricare il profilo utente')
+        console.error('Errore nel caricamento del profilo:', err)
       } finally {
         setLoading(false)
       }

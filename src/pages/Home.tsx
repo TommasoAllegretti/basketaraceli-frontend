@@ -86,7 +86,7 @@ export function Home() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle>Azioni</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <Button className="w-full justify-start" variant="outline">
@@ -96,7 +96,7 @@ export function Home() {
               View Reports
             </Button>
             <Button className="w-full justify-start" variant="outline">
-              Manage Users
+              Gestisci Utenti
             </Button>
           </CardContent>
         </Card>

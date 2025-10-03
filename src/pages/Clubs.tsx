@@ -23,8 +23,8 @@ export function Clubs() {
       const data = await getClubs()
       setAllClubs(data)
     } catch (err) {
-      setError('Failed to load clubs')
-      console.error('Error fetching clubs:', err)
+      setError('Impossibile caricare le società')
+      console.error('Errore nel caricamento delle società:', err)
     } finally {
       setLoading(false)
     }
@@ -140,13 +140,13 @@ export function Clubs() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Società</h1>
-          <p className="text-muted-foreground">Manage and view all clubs</p>
+          <p className="text-muted-foreground">Gestisci e visualizza tutte le società</p>
         </div>
         <Card>
           <CardContent className="p-6">
             <div className="text-center">
               <p className="text-red-600 mb-4">{error}</p>
-              <Button onClick={fetchClubs}>Try Again</Button>
+              <Button onClick={fetchClubs}>Ricarica</Button>
             </div>
           </CardContent>
         </Card>
@@ -250,7 +250,7 @@ export function Clubs() {
       {/* Pagination Info */}
       {totalPages > 1 && (
         <div className="text-center text-sm text-muted-foreground">
-          Page {currentPage} of {totalPages}
+          Pagina {currentPage} di {totalPages}
         </div>
       )}
     </div>

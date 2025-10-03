@@ -33,9 +33,9 @@ export function Team() {
           setError('Unauthorized. You can only view teams you belong to.')
         }
       } else {
-        setError('Failed to load team information')
+        setError('Impossibile caricare le informazioni della squadra')
       }
-      console.error('Error fetching team:', err)
+      console.error('Errore nel caricamento della squadra:', err)
     } finally {
       setLoading(false)
     }
@@ -47,11 +47,11 @@ export function Team() {
       if (!isNaN(id)) {
         fetchTeam(id)
       } else {
-        setError('Invalid team ID')
+        setError('ID squadra non valido')
         setLoading(false)
       }
     } else {
-      setError('No team ID provided')
+      setError('ID squadra non fornito')
       setLoading(false)
     }
   }, [teamId])
@@ -138,7 +138,7 @@ export function Team() {
           <CardContent className="p-6">
             <div className="text-center">
               <p className="text-red-600 mb-4">{error}</p>
-              <Button onClick={() => teamId && fetchTeam(parseInt(teamId, 10))}>Try Again</Button>
+              <Button onClick={() => teamId && fetchTeam(parseInt(teamId, 10))}>Ricarica</Button>
             </div>
           </CardContent>
         </Card>
@@ -321,7 +321,7 @@ export function Team() {
           ) : (
             <div className="text-center py-8">
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No players in this team</p>
+              <p className="text-muted-foreground">Nessun giocatore in questa squadra</p>
             </div>
           )}
         </CardContent>

@@ -146,7 +146,7 @@ export function Leagues() {
           <CardContent className="p-6">
             <div className="text-center">
               <p className="text-red-600 mb-4">{error}</p>
-              <Button onClick={fetchLeagues}>Riprova</Button>
+              <Button onClick={fetchLeagues}>Ricarica</Button>
             </div>
           </CardContent>
         </Card>
