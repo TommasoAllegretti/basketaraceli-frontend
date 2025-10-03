@@ -22,7 +22,7 @@ import type { Player as PlayerType } from '@/models/player'
 export function Player() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { isAdmin } = useAuth()
+  const { isAdmin, user } = useAuth()
   const playerId = searchParams.get('id')
 
   const [player, setPlayer] = useState<PlayerType | null>(null)
@@ -92,7 +92,7 @@ export function Player() {
       setDeleteLoading(true)
       await deletePlayer(player.id)
       navigate('/players')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Errore nell'eliminazione del giocatore:", err)
       setError('Impossibile eliminare il giocatore. Riprova più tardi.')
     } finally {
@@ -307,16 +307,16 @@ export function Player() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 flex-wrap">
+            {(isAdmin || (user?.player_id && user.player_id === player.id)) && (
+              <Button variant="outline" onClick={() => navigate(`/edit-player?id=${player.id}`)}>
+                Modifica Giocatore
+              </Button>
+            )}
             {isAdmin && (
-              <>
-                <Button variant="outline" onClick={() => navigate(`/edit-player?id=${player.id}`)}>
-                  Modifica Giocatore
-                </Button>
-                <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} disabled={deleteLoading}>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Elimina
-                </Button>
-              </>
+              <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} disabled={deleteLoading}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Elimina
+              </Button>
             )}
             <Button variant="outline">Visualizza Statistiche</Button>
             <Button variant="outline">Gestisci Squadre</Button>

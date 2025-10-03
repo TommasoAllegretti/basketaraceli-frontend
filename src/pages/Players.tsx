@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
 export function Players() {
-  const { isAdmin } = useAuth()
+  const { isAdmin, user } = useAuth()
   const navigate = useNavigate()
   const [allPlayers, setAllPlayers] = useState<Player[]>([])
   const [loading, setLoading] = useState(true)
@@ -248,14 +248,16 @@ export function Players() {
                 >
                   Vedi
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 cursor-pointer"
-                  onClick={() => navigate(`/edit-player?id=${player.id}`)}
-                >
-                  Modifica
-                </Button>
+                {(isAdmin || (user?.player_id && user.player_id === player.id)) && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 cursor-pointer"
+                    onClick={() => navigate(`/edit-player?id=${player.id}`)}
+                  >
+                    Modifica
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

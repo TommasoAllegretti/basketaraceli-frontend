@@ -107,11 +107,11 @@ export function ResetPassword() {
           state: { message: 'Password reimpostata con successo. Effettua il login con la nuova password.' },
         })
       }, 2000)
-    } catch (err: unknown) {
-      if ((err as any).response?.status === 400) {
+    } catch (err: any) {
+      if (err.response?.status === 400) {
         setError('Token scaduto o non valido. Richiedi un nuovo link di reset.')
-      } else if ((err as any).response?.data?.message) {
-        setError((err as any).response.data.message)
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message)
       } else {
         setError('Errore di connessione. Riprova più tardi.')
       }
