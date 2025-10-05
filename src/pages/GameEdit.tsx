@@ -408,7 +408,6 @@ export function GameEdit() {
                   type="date"
                   value={formData.date}
                   onChange={e => handleInputChange('date', e.target.value)}
-                  max={new Date().toISOString().split('T')[0]}
                   required
                 />
                 <p className="text-sm text-muted-foreground">
