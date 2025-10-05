@@ -410,9 +410,6 @@ export function GameEdit() {
                   onChange={e => handleInputChange('date', e.target.value)}
                   required
                 />
-                <p className="text-sm text-muted-foreground">
-                  Seleziona la data della partita (non può essere nel futuro)
-                </p>
               </div>
 
               {/* Squadre */}

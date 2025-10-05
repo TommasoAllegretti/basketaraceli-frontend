@@ -280,9 +280,7 @@ function GameCreateContent() {
                 onChange={value => handleInputChange('date', value)}
                 error={validationErrors.date}
                 required
-                max={new Date().toISOString().split('T')[0]}
                 icon={<Calendar className="h-4 w-4" />}
-                helpText="Seleziona la data della partita (non può essere nel futuro)"
               />
 
               {/* Squadre */}
