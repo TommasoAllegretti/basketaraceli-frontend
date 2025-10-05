@@ -328,7 +328,7 @@ function GameContent() {
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold text-sm sm:text-base truncate">Giocatore #{stat.player_id}</h3>
                     <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex-shrink-0">
-                      {Math.floor((stat.seconds_played ?? 0) / 60)}min
+                      {Math.floor((stat.seconds_played ?? 0) / 60)}:{(stat.seconds_played ?? 0) % 60}min
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-sm">

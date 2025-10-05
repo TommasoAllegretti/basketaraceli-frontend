@@ -64,10 +64,6 @@ export const validateDate = (date: string): FieldValidationResult => {
     return { isValid: false, error: 'Formato data non valido' }
   }
 
-  if (gameDate > today) {
-    return { isValid: false, error: 'La data non può essere nel futuro' }
-  }
-
   return { isValid: true }
 }
 
