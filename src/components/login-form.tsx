@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext'
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   async function handleLogin(dispatch: AppDispatch, email: string, password: string, refreshUser: () => Promise<void>) {
     const response = await login(email, password)
-    localStorage.setItem('token', response.token)
+    sessionStorage.setItem('token', response.token)
     dispatch(loginSuccess({ user: response.user, token: response.token }))
     // Refresh the auth context with user data
     await refreshUser()

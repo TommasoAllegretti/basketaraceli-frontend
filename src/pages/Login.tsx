@@ -1,7 +1,7 @@
 import { LoginForm } from '@/components/login-form'
 
 export function Login() {
-  localStorage.removeItem('token')
+  sessionStorage.removeItem('token')
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">

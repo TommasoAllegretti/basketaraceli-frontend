@@ -19,7 +19,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
     )
     const { token } = response.data
 
-    localStorage.setItem('token', token)
+    sessionStorage.setItem('token', token)
 
     return response.data
   } catch (error: unknown) {
