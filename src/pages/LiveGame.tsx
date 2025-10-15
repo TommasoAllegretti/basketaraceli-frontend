@@ -2,21 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import {
-  ArrowLeft,
-  Play,
-  Pause,
-  RotateCcw,
-  Target,
-  Users,
-  Trophy,
-  Timer,
-  AlertCircle,
-  CheckCircle,
-  XCircle,
-  Zap,
-  Shield,
-} from 'lucide-react'
+import { ArrowLeft, Play, Pause, RotateCcw, Users, Trophy, Timer } from 'lucide-react'
 import { getGame } from '@/api/gameService'
 import { getPlayers } from '@/api/playerService'
 import { recordAction as recordPlayerAction, undoAction as undoPlayerAction } from '@/api/playerStatService'
@@ -104,81 +90,66 @@ function LiveGameContent() {
     {
       action: 'three_point_goal_made',
       label: '3PT ✓',
-      //icon: <Target className="h-4 w-4" />,
       color: 'bg-green-500 hover:bg-green-600',
-      //points: 3,
     },
     {
       action: 'three_point_goal_missed',
       label: '3PT ✗',
-      //icon: <XCircle className="h-4 w-4" />,
       color: 'bg-red-500 hover:bg-red-600',
     },
     {
       action: 'two_point_goal_made',
       label: '2PT ✓',
-      //icon: <CheckCircle className="h-4 w-4" />,
       color: 'bg-green-500 hover:bg-green-600',
-      //points: 2,
     },
     {
       action: 'two_point_goal_missed',
       label: '2PT ✗',
-      //icon: <XCircle className="h-4 w-4" />,
       color: 'bg-red-500 hover:bg-red-600',
     },
     {
       action: 'free_throw_made',
       label: 'FT ✓',
-      //icon: <CheckCircle className="h-4 w-4" />,
       color: 'bg-green-500 hover:bg-green-600',
-      //points: 1,
     },
     {
       action: 'free_throw_missed',
       label: 'FT ✗',
-      //icon: <XCircle className="h-4 w-4" />,
       color: 'bg-red-500 hover:bg-red-600',
     },
     {
       action: 'offensive_rebound',
       label: 'REB OFF',
-      //icon: <Zap className="h-4 w-4" />,
       color: 'bg-orange-500 hover:bg-orange-600',
     },
     {
       action: 'defensive_rebound',
       label: 'REB DEF',
-      //icon: <Shield className="h-4 w-4" />,
       color: 'bg-blue-500 hover:bg-blue-600',
     },
     {
       action: 'assist',
       label: 'ASSIST',
-      //icon: <Users className="h-4 w-4" />,
       color: 'bg-purple-500 hover:bg-purple-600',
     },
     {
       action: 'turnover',
       label: 'TURNOVER',
-      //icon: <RotateCcw className="h-4 w-4" />,
       color: 'bg-red-500 hover:bg-red-600',
     },
     {
       action: 'steal',
-      label: 'STEAL', //icon: <Zap className="h-4 w-4" />,
       color: 'bg-yellow-500 hover:bg-yellow-600',
+      label: 'STEAL',
     },
     {
       action: 'block',
       label: 'BLOCK',
-      //icon: <Shield className="h-4 w-4" />,
       color: 'bg-indigo-500 hover:bg-indigo-600',
     },
     {
       action: 'personal_foul',
       label: 'FOUL',
-      //icon: <AlertCircle className="h-4 w-4" />,
       color: 'bg-red-500 hover:bg-red-600',
     },
   ]
