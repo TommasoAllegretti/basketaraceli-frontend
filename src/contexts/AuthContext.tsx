@@ -31,7 +31,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const refreshUser = async () => {
     try {
-      const token = sessionStorage.getItem('token')
+      const token = localStorage.getItem('token')
       if (token) {
         const userData = await getCurrentUser()
         setUser(userData)
@@ -42,14 +42,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Error fetching user:', error)
       setUser(null)
       // If token is invalid, remove it
-      sessionStorage.removeItem('token')
+      localStorage.removeItem('token')
     } finally {
       setLoading(false)
     }
   }
 
   const logout = () => {
-    sessionStorage.removeItem('token')
+    localStorage.removeItem('token')
     setUser(null)
     window.location.href = '/admin/login'
   }

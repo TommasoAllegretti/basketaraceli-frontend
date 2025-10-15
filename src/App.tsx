@@ -32,7 +32,6 @@ import { GameStats } from './pages/GameStats'
 import { GameStat } from './pages/GameStat'
 import { GameStatCreate } from './pages/GameStatCreate'
 import { GameStatEdit } from './pages/GameStatEdit'
-import { LiveGame } from './pages/LiveGame'
 
 function App() {
   return (
@@ -78,7 +77,6 @@ function App() {
                     <Route path="/game-stat" element={<GameStat />} />
                     <Route path="/create-game-stat" element={<GameStatCreate />} />
                     <Route path="/edit-game-stat" element={<GameStatEdit />} />
-                    <Route path="/live-game" element={<LiveGame />} />
                   </Routes>
                 </ProtectedRoute>
               }

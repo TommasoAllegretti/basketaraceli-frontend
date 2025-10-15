@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Trophy, ArrowLeft, Calendar, Users, Target, BarChart3, Edit, Trash2, AlertCircle, Play } from 'lucide-react'
+import { Trophy, ArrowLeft, Calendar, Users, Target, BarChart3, Edit, Trash2, AlertCircle } from 'lucide-react'
 import { getGame, deleteGame } from '@/api/gameService'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Game as GameType } from '@/models/game'
@@ -364,13 +364,6 @@ function GameContent() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Button
-                onClick={() => navigate(`/live-game?id=${game.id}`)}
-                className="w-full sm:w-auto touch-manipulation"
-              >
-                <Play className="h-4 w-4 mr-2" />
-                Inizia Partita
-              </Button>
               <Button
                 variant="outline"
                 onClick={() => navigate(`/edit-game?id=${game.id}`)}
