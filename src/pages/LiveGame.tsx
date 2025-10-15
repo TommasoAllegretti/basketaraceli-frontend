@@ -18,8 +18,10 @@ import {
   Shield,
 } from 'lucide-react'
 import { getGame } from '@/api/gameService'
+import { getPlayers } from '@/api/playerService'
 import { recordAction as recordPlayerAction, undoAction as undoPlayerAction } from '@/api/playerStatService'
 import type { Game as GameType } from '@/models/game'
+import type { Player } from '@/models/player'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { ErrorDisplay } from '@/components/ErrorDisplay'
@@ -73,7 +75,7 @@ type ActionType =
 interface ActionButton {
   action: ActionType
   label: string
-  icon: React.ReactNode
+  icon?: React.ReactNode
   color: string
   points?: number
 }
@@ -84,7 +86,9 @@ function LiveGameContent() {
   const gameId = searchParams.get('id')
 
   const [game, setGame] = useState<GameType | null>(null)
+  const [players, setPlayers] = useState<Player[]>([])
   const [loading, setLoading] = useState(true)
+  const [playersLoading, setPlayersLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedTeam, setSelectedTeam] = useState<'home' | 'away'>('home')
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null)
@@ -100,77 +104,81 @@ function LiveGameContent() {
     {
       action: 'three_point_goal_made',
       label: '3PT ✓',
-      icon: <Target className="h-4 w-4" />,
+      //icon: <Target className="h-4 w-4" />,
       color: 'bg-green-500 hover:bg-green-600',
-      points: 3,
+      //points: 3,
     },
     {
       action: 'three_point_goal_missed',
       label: '3PT ✗',
-      icon: <XCircle className="h-4 w-4" />,
+      //icon: <XCircle className="h-4 w-4" />,
       color: 'bg-red-500 hover:bg-red-600',
     },
     {
       action: 'two_point_goal_made',
       label: '2PT ✓',
-      icon: <CheckCircle className="h-4 w-4" />,
+      //icon: <CheckCircle className="h-4 w-4" />,
       color: 'bg-green-500 hover:bg-green-600',
-      points: 2,
+      //points: 2,
     },
     {
       action: 'two_point_goal_missed',
       label: '2PT ✗',
-      icon: <XCircle className="h-4 w-4" />,
+      //icon: <XCircle className="h-4 w-4" />,
       color: 'bg-red-500 hover:bg-red-600',
     },
     {
       action: 'free_throw_made',
       label: 'FT ✓',
-      icon: <CheckCircle className="h-4 w-4" />,
+      //icon: <CheckCircle className="h-4 w-4" />,
       color: 'bg-green-500 hover:bg-green-600',
-      points: 1,
+      //points: 1,
     },
     {
       action: 'free_throw_missed',
       label: 'FT ✗',
-      icon: <XCircle className="h-4 w-4" />,
+      //icon: <XCircle className="h-4 w-4" />,
       color: 'bg-red-500 hover:bg-red-600',
     },
     {
       action: 'offensive_rebound',
       label: 'REB OFF',
-      icon: <Zap className="h-4 w-4" />,
+      //icon: <Zap className="h-4 w-4" />,
       color: 'bg-orange-500 hover:bg-orange-600',
     },
     {
       action: 'defensive_rebound',
       label: 'REB DEF',
-      icon: <Shield className="h-4 w-4" />,
+      //icon: <Shield className="h-4 w-4" />,
       color: 'bg-blue-500 hover:bg-blue-600',
     },
     {
       action: 'assist',
       label: 'ASSIST',
-      icon: <Users className="h-4 w-4" />,
+      //icon: <Users className="h-4 w-4" />,
       color: 'bg-purple-500 hover:bg-purple-600',
     },
     {
       action: 'turnover',
       label: 'TURNOVER',
-      icon: <RotateCcw className="h-4 w-4" />,
+      //icon: <RotateCcw className="h-4 w-4" />,
       color: 'bg-red-500 hover:bg-red-600',
     },
-    { action: 'steal', label: 'STEAL', icon: <Zap className="h-4 w-4" />, color: 'bg-yellow-500 hover:bg-yellow-600' },
+    {
+      action: 'steal',
+      label: 'STEAL', //icon: <Zap className="h-4 w-4" />,
+      color: 'bg-yellow-500 hover:bg-yellow-600',
+    },
     {
       action: 'block',
       label: 'BLOCK',
-      icon: <Shield className="h-4 w-4" />,
+      //icon: <Shield className="h-4 w-4" />,
       color: 'bg-indigo-500 hover:bg-indigo-600',
     },
     {
       action: 'personal_foul',
       label: 'FOUL',
-      icon: <AlertCircle className="h-4 w-4" />,
+      //icon: <AlertCircle className="h-4 w-4" />,
       color: 'bg-red-500 hover:bg-red-600',
     },
   ]
@@ -189,11 +197,25 @@ function LiveGameContent() {
     }
   }
 
+  const fetchPlayers = async () => {
+    try {
+      setPlayersLoading(true)
+      const data = await getPlayers()
+      setPlayers(data)
+    } catch (err: any) {
+      console.error('Errore nel caricamento dei giocatori:', err)
+      // Don't set error here as it's not critical for the main functionality
+    } finally {
+      setPlayersLoading(false)
+    }
+  }
+
   useEffect(() => {
     if (gameId) {
       const id = parseInt(gameId, 10)
       if (!isNaN(id)) {
         fetchGame(id)
+        fetchPlayers()
       } else {
         setError('ID partita non valido')
         setLoading(false)
@@ -314,6 +336,14 @@ function LiveGameContent() {
   const currentTeam = selectedTeam === 'home' ? game.home_team : game.away_team
   const currentPlayerStat = selectedPlayer ? playerStats[selectedPlayer] : null
 
+  // Get players for the selected team
+  const getTeamPlayers = () => {
+    if (!currentTeam) return []
+    return players.filter(player => player.teams.some(team => team.id === currentTeam.id))
+  }
+
+  const teamPlayers = getTeamPlayers()
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -414,20 +444,32 @@ function LiveGameContent() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {/* Mock players - replace with actual team players */}
-              {Array.from({ length: 12 }, (_, i) => i + 1).map(playerNum => (
-                <Button
-                  key={playerNum}
-                  variant={selectedPlayer === playerNum ? 'default' : 'outline'}
-                  onClick={() => setSelectedPlayer(playerNum)}
-                  className="h-16"
-                >
-                  <div className="text-center">
-                    <div className="font-bold">#{playerNum}</div>
-                    <div className="text-xs">Giocatore {playerNum}</div>
-                  </div>
-                </Button>
-              ))}
+              {playersLoading ? (
+                <div className="col-span-full text-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+                  <p className="text-sm text-muted-foreground">Caricamento giocatori...</p>
+                </div>
+              ) : teamPlayers.length > 0 ? (
+                teamPlayers.map(player => (
+                  <Button
+                    key={player.id}
+                    variant={selectedPlayer === player.id ? 'default' : 'outline'}
+                    onClick={() => setSelectedPlayer(player.id)}
+                    className="!h-16"
+                  >
+                    <div className="text-center">
+                      <div className="font-bold">#{player.jersey_number || player.id}</div>
+                      <div className="text-xs truncate max-w-full">{player.name}</div>
+                      {player.position && <div className="text-xs text-muted-foreground">{player.position}</div>}
+                    </div>
+                  </Button>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">
+                  <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-sm text-muted-foreground">Nessun giocatore trovato per questa squadra</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -438,7 +480,9 @@ function LiveGameContent() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Azioni - Giocatore #{selectedPlayer}</span>
+              <span>
+                Azioni - {teamPlayers.find(p => p.id === selectedPlayer)?.name || `Giocatore #${selectedPlayer}`}
+              </span>
               {lastAction && (
                 <Button variant="outline" size="sm" onClick={undoLastAction} disabled={actionLoading}>
                   <RotateCcw className="h-4 w-4 mr-2" />
@@ -472,7 +516,9 @@ function LiveGameContent() {
       {currentPlayerStat && (
         <Card>
           <CardHeader>
-            <CardTitle>Statistiche Giocatore #{selectedPlayer}</CardTitle>
+            <CardTitle>
+              Statistiche - {teamPlayers.find(p => p.id === selectedPlayer)?.name || `Giocatore #${selectedPlayer}`}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
