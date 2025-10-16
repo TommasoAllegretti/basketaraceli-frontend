@@ -199,7 +199,7 @@ function LiveGameContent() {
 
   // Game timer effect
   useEffect(() => {
-    let interval: any
+    let interval: unknown
     if (isGameRunning) {
       interval = setInterval(() => {
         setGameTime(prev => prev + 1)
@@ -305,7 +305,45 @@ function LiveGameContent() {
   }
 
   const currentTeam = selectedTeam === 'home' ? game.home_team : game.away_team
-  const currentPlayerStat = selectedPlayer ? playerStats[selectedPlayer] : null
+
+  // Get current player stat or create default empty stat
+  const getCurrentPlayerStat = () => {
+    if (!selectedPlayer) return null
+
+    // Return existing stat or create default empty stat
+    return (
+      playerStats[selectedPlayer] || {
+        id: undefined,
+        player_id: selectedPlayer,
+        game_id: game?.id || 0,
+        points: 0,
+        field_goals_made: 0,
+        field_goals_attempted: 0,
+        three_point_field_goals_made: 0,
+        three_point_field_goals_attempted: 0,
+        two_point_field_goals_made: 0,
+        two_point_field_goals_attempted: 0,
+        free_throws_made: 0,
+        free_throws_attempted: 0,
+        offensive_rebounds: 0,
+        defensive_rebounds: 0,
+        total_rebounds: 0,
+        assists: 0,
+        turnovers: 0,
+        steals: 0,
+        blocks: 0,
+        personal_fouls: 0,
+        field_goal_percentage: 0,
+        three_point_field_goal_percentage: 0,
+        two_point_field_goal_percentage: 0,
+        free_throw_percentage: 0,
+        performance_index_rating: 0,
+        efficiency: 0,
+      }
+    )
+  }
+
+  const currentPlayerStat = getCurrentPlayerStat()
 
   // Get players for the selected team
   const getTeamPlayers = () => {
@@ -314,6 +352,34 @@ function LiveGameContent() {
   }
 
   const teamPlayers = getTeamPlayers()
+
+  // Get players for home team
+  const getHomeTeamPlayers = () => {
+    if (!game) return []
+    return players.filter(player => player.teams.some(team => team.id === game.home_team.id))
+  }
+
+  // Get players for away team
+  const getAwayTeamPlayers = () => {
+    if (!game) return []
+    return players.filter(player => player.teams.some(team => team.id === game.away_team.id))
+  }
+
+  // Calculate home team total points
+  const getHomeTeamPoints = () => {
+    const homePlayerIds = getHomeTeamPlayers().map(player => player.id)
+    return Object.values(playerStats)
+      .filter(stat => stat.game_id === game?.id && homePlayerIds.includes(stat.player_id))
+      .reduce((total, stat) => total + (stat.points || 0), 0)
+  }
+
+  // Calculate away team total points
+  const getAwayTeamPoints = () => {
+    const awayPlayerIds = getAwayTeamPlayers().map(player => player.id)
+    return Object.values(playerStats)
+      .filter(stat => stat.game_id === game?.id && awayPlayerIds.includes(stat.player_id))
+      .reduce((total, stat) => total + (stat.points || 0), 0)
+  }
 
   return (
     <div className="space-y-6">
@@ -351,20 +417,14 @@ function LiveGameContent() {
         <CardContent>
           <div className="grid grid-cols-2 gap-4 text-center">
             <div className="p-4 bg-blue-50 rounded-lg">
-              <div className="text-3xl font-bold text-blue-600">
-                {Object.values(playerStats)
-                  .filter(stat => stat.game_id === game.id)
-                  .reduce((total, stat) => total + (stat.points || 0), 0)}
-              </div>
+              <div className="text-3xl font-bold text-blue-600">{getHomeTeamPoints()}</div>
               <div className="text-sm font-medium">{game.home_team.abbreviation}</div>
+              <div className="text-xs text-muted-foreground">Casa</div>
             </div>
             <div className="p-4 bg-red-50 rounded-lg">
-              <div className="text-3xl font-bold text-red-600">
-                {Object.values(playerStats)
-                  .filter(stat => stat.game_id === game.id)
-                  .reduce((total, stat) => total + (stat.points || 0), 0)}
-              </div>
+              <div className="text-3xl font-bold text-red-600">{getAwayTeamPoints()}</div>
               <div className="text-sm font-medium">{game.away_team.abbreviation}</div>
+              <div className="text-xs text-muted-foreground">Ospite</div>
             </div>
           </div>
         </CardContent>
@@ -484,7 +544,7 @@ function LiveGameContent() {
       )}
 
       {/* Player Stats */}
-      {currentPlayerStat && (
+      {selectedPlayer && (
         <Card>
           <CardHeader>
             <CardTitle>
@@ -517,27 +577,21 @@ function LiveGameContent() {
                 <div>
                   {currentPlayerStat.field_goals_made}/{currentPlayerStat.field_goals_attempted}
                 </div>
-                {currentPlayerStat.field_goal_percentage && (
-                  <div className="text-muted-foreground">{currentPlayerStat.field_goal_percentage}%</div>
-                )}
+                <div className="text-muted-foreground">{currentPlayerStat.field_goal_percentage || 0}%</div>
               </div>
               <div className="text-center p-3 bg-gray-50 rounded">
                 <div className="font-medium">Tiri da 3</div>
                 <div>
                   {currentPlayerStat.three_point_field_goals_made}/{currentPlayerStat.three_point_field_goals_attempted}
                 </div>
-                {currentPlayerStat.three_point_field_goal_percentage && (
-                  <div className="text-muted-foreground">{currentPlayerStat.three_point_field_goal_percentage}%</div>
-                )}
+                <div className="text-muted-foreground">{currentPlayerStat.three_point_field_goal_percentage || 0}%</div>
               </div>
               <div className="text-center p-3 bg-gray-50 rounded">
                 <div className="font-medium">Tiri Liberi</div>
                 <div>
                   {currentPlayerStat.free_throws_made}/{currentPlayerStat.free_throws_attempted}
                 </div>
-                {currentPlayerStat.free_throw_percentage && (
-                  <div className="text-muted-foreground">{currentPlayerStat.free_throw_percentage}%</div>
-                )}
+                <div className="text-muted-foreground">{currentPlayerStat.free_throw_percentage || 0}%</div>
               </div>
             </div>
           </CardContent>
