@@ -173,7 +173,7 @@ function LiveGameContent() {
       setPlayersLoading(true)
       const data = await getPlayers()
       setPlayers(data)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Errore nel caricamento dei giocatori:', err)
       // Don't set error here as it's not critical for the main functionality
     } finally {
@@ -544,7 +544,7 @@ function LiveGameContent() {
       )}
 
       {/* Player Stats */}
-      {selectedPlayer && (
+      {selectedPlayer && currentPlayerStat && (
         <Card>
           <CardHeader>
             <CardTitle>
