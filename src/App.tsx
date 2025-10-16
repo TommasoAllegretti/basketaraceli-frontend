@@ -33,6 +33,7 @@ import { GameStat } from './pages/GameStat'
 import { GameStatCreate } from './pages/GameStatCreate'
 import { GameStatEdit } from './pages/GameStatEdit'
 import { LiveGame } from './pages/LiveGame'
+import { Settings } from './pages/Settings'
 
 function App() {
   return (
@@ -79,6 +80,7 @@ function App() {
                     <Route path="/create-game-stat" element={<GameStatCreate />} />
                     <Route path="/edit-game-stat" element={<GameStatEdit />} />
                     <Route path="/live-game" element={<LiveGame />} />
+                    <Route path="/settings" element={<Settings />} />
                   </Routes>
                 </ProtectedRoute>
               }

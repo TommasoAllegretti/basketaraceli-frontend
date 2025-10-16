@@ -23,7 +23,7 @@ interface AppLayoutProps {
 }
 
 const AppLayout = ({ children }: AppLayoutProps) => {
-  const { logout } = useAuth()
+  const { logout, isAdmin } = useAuth()
   const location = useLocation()
 
   const isActive = (path: string) => {
@@ -111,14 +111,16 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive('/admin/settings')}>
-                    <a href="/admin/settings">
-                      <Settings />
-                      <span>Impostazioni</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {isAdmin && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={isActive('/admin/settings')}>
+                      <a href="/admin/settings">
+                        <Settings />
+                        <span>Impostazioni</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
