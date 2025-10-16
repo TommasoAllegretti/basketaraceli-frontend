@@ -569,6 +569,18 @@ function LiveGameContent() {
                 <div className="text-2xl font-bold">{currentPlayerStat.personal_fouls}</div>
                 <div className="text-sm text-muted-foreground">Falli</div>
               </div>
+              <div>
+                <div className="text-2xl font-bold">{currentPlayerStat.turnovers}</div>
+                <div className="text-sm text-muted-foreground">Palle Perse</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{currentPlayerStat.steals}</div>
+                <div className="text-sm text-muted-foreground">Palle Recuperate</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{currentPlayerStat.blocks}</div>
+                <div className="text-sm text-muted-foreground">Stoppate</div>
+              </div>
             </div>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
