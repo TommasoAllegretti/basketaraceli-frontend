@@ -25,6 +25,7 @@ import type { CreateGameStatData, UpdateGameStatData } from '@/models/gameStat'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { ErrorDisplay } from '@/components/ErrorDisplay'
+import { PlayerStatModal } from '@/components/PlayerStatModal'
 
 function GameContent() {
   const [searchParams] = useSearchParams()
@@ -40,6 +41,8 @@ function GameContent() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [generateStatsLoading, setGenerateStatsLoading] = useState(false)
   const [generateStatsSuccess, setGenerateStatsSuccess] = useState<string | null>(null)
+  const [selectedPlayerStat, setSelectedPlayerStat] = useState<any | null>(null)
+  const [isPlayerStatModalOpen, setIsPlayerStatModalOpen] = useState(false)
 
   const fetchGame = async (id: number) => {
     try {
@@ -171,6 +174,18 @@ function GameContent() {
   const getPlayerName = (playerId: number) => {
     const player = players.find(p => p.id === playerId)
     return player ? player.name : `Giocatore #${playerId}`
+  }
+
+  // Function to handle clicking on a player stat card
+  const handlePlayerStatClick = (stat: any) => {
+    setSelectedPlayerStat(stat)
+    setIsPlayerStatModalOpen(true)
+  }
+
+  // Function to close the modal
+  const closePlayerStatModal = () => {
+    setIsPlayerStatModalOpen(false)
+    setSelectedPlayerStat(null)
   }
 
   // Function to generate game statistics by summing player stats
@@ -494,13 +509,20 @@ function GameContent() {
           <CardContent>
             <div className="grid gap-3 sm:gap-4 lg:grid-cols-2 xl:grid-cols-3">
               {game.stats.map(stat => (
-                <div key={stat.id} className="p-3 sm:p-4 border rounded-lg">
+                <div
+                  key={stat.id}
+                  className="p-3 sm:p-4 border rounded-lg cursor-pointer hover:shadow-md hover:border-blue-300 transition-all duration-200"
+                  onClick={() => handlePlayerStatClick(stat)}
+                >
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold text-sm sm:text-base truncate">{getPlayerName(stat.player_id)}</h3>
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex-shrink-0">
-                      {Math.floor((stat.seconds_played ?? 0) / 60)}:
-                      {String((stat.seconds_played ?? 0) % 60).padStart(2, '0')}min
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex-shrink-0">
+                        {Math.floor((stat.seconds_played ?? 0) / 60)}:
+                        {String((stat.seconds_played ?? 0) % 60).padStart(2, '0')}min
+                      </span>
+                      <BarChart3 className="h-4 w-4 text-blue-500" />
+                    </div>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-sm">
                     <div className="text-center">
@@ -630,6 +652,14 @@ function GameContent() {
           </CardContent>
         </Card>
       )}
+
+      {/* Player Stat Modal */}
+      <PlayerStatModal
+        isOpen={isPlayerStatModalOpen}
+        onClose={closePlayerStatModal}
+        playerStat={selectedPlayerStat}
+        playerName={selectedPlayerStat ? getPlayerName(selectedPlayerStat.player_id) : ''}
+      />
     </div>
   )
 }
