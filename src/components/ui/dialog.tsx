@@ -56,7 +56,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
 export function DialogContent({ className = '', children }: DialogContentProps) {
   return (
     <div
-      className={`bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 xl:p-10 max-h-[90vh] overflow-hidden ${className}`}
+      className={`bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 xl:p-10 max-h-[90vh] overflow-y-auto ${className}`}
     >
       {children}
     </div>

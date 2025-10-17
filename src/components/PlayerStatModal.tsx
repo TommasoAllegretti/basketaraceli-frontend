@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Target, TrendingUp, HandHeart, Activity, Award, Clock, Users, BarChart3 } from 'lucide-react'
+import { Target, TrendingUp, HandHeart, Activity, Award, Clock, BarChart3 } from 'lucide-react'
 
 interface PlayerStat {
   id: number
@@ -74,7 +74,7 @@ export function PlayerStatModal({ isOpen, onClose, playerStat, playerName }: Pla
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 max-h-[75vh] lg:max-h-[80vh] xl:max-h-[85vh] overflow-y-auto">
+        <div className="space-y-6">
           {/* Basic Stats */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
             <Card>
@@ -285,40 +285,6 @@ export function PlayerStatModal({ isOpen, onClose, playerStat, playerName }: Pla
                   <div className="text-xs text-muted-foreground mt-1">
                     Formula: Punti + Rimbalzi + Assist + Rubate + Stoppate - Tiri Sbagliati - Liberi Sbagliati - Perse
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Additional Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Informazioni Aggiuntive
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">ID Statistica:</span>
-                  <Badge variant="outline">{playerStat.id}</Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">ID Giocatore:</span>
-                  <Badge variant="outline">{playerStat.player_id}</Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">ID Partita:</span>
-                  <Badge variant="outline">{playerStat.game_id}</Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Creato il:</span>
-                  <span>{new Date(playerStat.created_at).toLocaleString('it-IT')}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Ultimo aggiornamento:</span>
-                  <span>{new Date(playerStat.updated_at).toLocaleString('it-IT')}</span>
                 </div>
               </div>
             </CardContent>
