@@ -15,7 +15,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, Settings, User, LogOut, Users, Shield, Building, Trophy, Calendar, BarChart3 } from 'lucide-react'
+import { Home, Settings, User, LogOut, Users, Shield, Building, Trophy, Calendar } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface AppLayoutProps {
