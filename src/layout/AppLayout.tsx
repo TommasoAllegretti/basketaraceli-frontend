@@ -23,7 +23,7 @@ interface AppLayoutProps {
 }
 
 const AppLayout = ({ children }: AppLayoutProps) => {
-  const { logout } = useAuth()
+  const { logout, isAdmin } = useAuth()
   const location = useLocation()
 
   const isActive = (path: string) => {
@@ -71,22 +71,26 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive('/admin/clubs')}>
-                    <a href="/admin/clubs">
-                      <Building />
-                      <span>Società</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive('/admin/leagues')}>
-                    <a href="/admin/leagues">
-                      <Trophy />
-                      <span>Campionati</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {isAdmin && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={isActive('/admin/clubs')}>
+                      <a href="/admin/clubs">
+                        <Building />
+                        <span>Società</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
+                {isAdmin && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={isActive('/admin/leagues')}>
+                      <a href="/admin/leagues">
+                        <Trophy />
+                        <span>Campionati</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive('/admin/games')}>
                     <a href="/admin/games">
