@@ -74,8 +74,18 @@ export function PlayerStat() {
     })
   }
 
-  const formatPercentage = (value: number) => {
-    return value.toFixed(1) + '%'
+  const formatPercentage = (value: number | string | null | undefined) => {
+    if (value === null || value === undefined) {
+      return '0.0%'
+    }
+
+    const numValue = typeof value === 'string' ? parseFloat(value) : value
+
+    if (isNaN(numValue)) {
+      return '0.0%'
+    }
+
+    return numValue.toFixed(1) + '%'
   }
 
   const formatTime = (seconds: number) => {

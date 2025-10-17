@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User, ArrowLeft, Save, Calendar, Ruler, Hash, AlertCircle, Shield, Target } from 'lucide-react'
+import { User, ArrowLeft, Save, Calendar, Ruler, Hash, AlertCircle, Shield } from 'lucide-react'
 import { getPlayer, updatePlayer, type UpdatePlayerData } from '@/api/playerService'
 import { getTeams } from '@/api/teamService'
 import { useAuth } from '@/contexts/AuthContext'
@@ -15,7 +15,7 @@ export function PlayerEdit() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const playerId = searchParams.get('id')
-  const { isAdmin, loading: authLoading } = useAuth()
+  const { isAdmin, user, loading: authLoading } = useAuth()
 
   const [player, setPlayer] = useState<Player | null>(null)
   const [formData, setFormData] = useState<UpdatePlayerData>({
@@ -70,12 +70,17 @@ export function PlayerEdit() {
           assists_per_game: parseFloat(playerData.assists_per_game) || 0,
           teams: playerData.teams?.map(team => team.id) || [],
         })
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Errore nel recupero dei dati:', err)
-        if (err.response?.status === 403) {
-          setError('Non autorizzato. Non hai i permessi per modificare questo giocatore.')
-        } else if (err.response?.status === 404) {
-          setError('Giocatore non trovato.')
+        if (err && typeof err === 'object' && 'response' in err) {
+          const response = (err as { response?: { status?: number; data?: { message?: string } } }).response
+          if (response?.status === 403) {
+            setError('Non autorizzato. Non hai i permessi per modificare questo giocatore.')
+          } else if (response?.status === 404) {
+            setError('Giocatore non trovato.')
+          } else {
+            setError('Impossibile caricare i dati del giocatore')
+          }
         } else {
           setError('Impossibile caricare i dati del giocatore')
         }
@@ -169,7 +174,8 @@ export function PlayerEdit() {
         playerData.rebounds_per_game = formData.rebounds_per_game
       if (formData.assists_per_game !== undefined && formData.assists_per_game >= 0)
         playerData.assists_per_game = formData.assists_per_game
-      if (formData.teams && formData.teams.length >= 0) playerData.teams = formData.teams
+      // Only include teams data for admin users
+      if (isAdmin && formData.teams && formData.teams.length >= 0) playerData.teams = formData.teams
 
       const response = await updatePlayer(parseInt(playerId, 10), playerData)
 
@@ -179,11 +185,16 @@ export function PlayerEdit() {
       setTimeout(() => {
         navigate(`/player?id=${playerId}`)
       }, 2000)
-    } catch (err: any) {
-      if (err.response?.status === 403) {
-        setError('Non autorizzato. Solo gli amministratori possono modificare giocatori.')
-      } else if (err.response?.data?.message) {
-        setError(err.response.data.message)
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const response = (err as { response?: { status?: number; data?: { message?: string } } }).response
+        if (response?.status === 403) {
+          setError('Non autorizzato. Puoi modificare solo il tuo profilo giocatore.')
+        } else if (response?.data?.message) {
+          setError(response.data.message)
+        } else {
+          setError('Impossibile aggiornare il giocatore. Riprova.')
+        }
       } else {
         setError('Impossibile aggiornare il giocatore. Riprova.')
       }
@@ -247,8 +258,11 @@ export function PlayerEdit() {
     )
   }
 
-  // Show unauthorized only after auth is loaded and user is confirmed not admin
-  if (!authLoading && !isAdmin) {
+  // Check if user can edit this player (admin or own player)
+  const canEditPlayer = isAdmin || (user?.player_id && playerId && user.player_id === parseInt(playerId, 10))
+
+  // Show unauthorized only after auth is loaded and user cannot edit this player
+  if (!authLoading && !canEditPlayer) {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
@@ -266,7 +280,9 @@ export function PlayerEdit() {
             <div className="text-center">
               <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
               <p className="text-red-600 mb-4">Accesso Non Autorizzato</p>
-              <p className="text-muted-foreground mb-4">Solo gli amministratori possono modificare giocatori.</p>
+              <p className="text-muted-foreground mb-4">
+                Puoi modificare solo il tuo profilo giocatore. Gli amministratori possono modificare tutti i giocatori.
+              </p>
               <Button onClick={() => navigate('/players')}>Torna ai Giocatori</Button>
             </div>
           </CardContent>
@@ -430,95 +446,68 @@ export function PlayerEdit() {
                 <p className="text-sm text-muted-foreground">Numero di maglia del giocatore (1-99)</p>
               </div>
 
-              {/* Statistiche */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Statistiche (Opzionali)
-                </h3>
+              {/* Squadre - Solo per amministratori */}
+              {isAdmin && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Squadre Associate
+                  </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Punti per Partita */}
-                  <div className="space-y-2">
-                    <Label htmlFor="points_per_game">Punti per Partita</Label>
-                    <Input
-                      id="points_per_game"
-                      type="number"
-                      step="0.1"
-                      placeholder="es. 15.5"
-                      value={formData.points_per_game || ''}
-                      onChange={e => handleInputChange('points_per_game', parseFloat(e.target.value) || 0)}
-                      min="0"
-                    />
-                  </div>
-
-                  {/* Rimbalzi per Partita */}
-                  <div className="space-y-2">
-                    <Label htmlFor="rebounds_per_game">Rimbalzi per Partita</Label>
-                    <Input
-                      id="rebounds_per_game"
-                      type="number"
-                      step="0.1"
-                      placeholder="es. 5.2"
-                      value={formData.rebounds_per_game || ''}
-                      onChange={e => handleInputChange('rebounds_per_game', parseFloat(e.target.value) || 0)}
-                      min="0"
-                    />
-                  </div>
-
-                  {/* Assist per Partita */}
-                  <div className="space-y-2">
-                    <Label htmlFor="assists_per_game">Assist per Partita</Label>
-                    <Input
-                      id="assists_per_game"
-                      type="number"
-                      step="0.1"
-                      placeholder="es. 4.8"
-                      value={formData.assists_per_game || ''}
-                      onChange={e => handleInputChange('assists_per_game', parseFloat(e.target.value) || 0)}
-                      min="0"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Squadre */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Squadre Associate (Opzionale)
-                </h3>
-
-                {teams.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto border rounded-md p-3">
-                    {teams.map(team => (
-                      <label
-                        key={team.id}
-                        className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={formData.teams?.includes(team.id) || false}
-                          onChange={() => handleTeamToggle(team.id)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <div className="flex-1">
-                          <div className="text-sm font-medium">{team.name}</div>
-                          <div className="text-xs text-gray-500">
-                            {team.club?.name} - {team.league?.name}
+                  {teams.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto border rounded-md p-3">
+                      {teams.map(team => (
+                        <label
+                          key={team.id}
+                          className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formData.teams?.includes(team.id) || false}
+                            onChange={() => handleTeamToggle(team.id)}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <div className="flex-1">
+                            <div className="text-sm font-medium">{team.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {team.club?.name} - {team.league?.name}
+                            </div>
                           </div>
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Nessuna squadra disponibile</p>
+                  )}
+
+                  {formData.teams && formData.teams.length > 0 && (
+                    <p className="text-sm text-muted-foreground">{formData.teams.length} squadra/e selezionata/e</p>
+                  )}
+                </div>
+              )}
+
+              {/* Squadre attuali - Solo visualizzazione per non-admin */}
+              {!isAdmin && player && player.teams && player.teams.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Squadre Attuali
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 border rounded-md p-3 bg-gray-50">
+                    {player.teams.map(team => (
+                      <div key={team.id} className="p-2 bg-white rounded border">
+                        <div className="text-sm font-medium">{team.name}</div>
+                        <div className="text-xs text-gray-500">
+                          {team.club?.name} - {team.league?.name}
                         </div>
-                      </label>
+                      </div>
                     ))}
                   </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">Nessuna squadra disponibile</p>
-                )}
-
-                {formData.teams && formData.teams.length > 0 && (
-                  <p className="text-sm text-muted-foreground">{formData.teams.length} squadra/e selezionata/e</p>
-                )}
-              </div>
+                  <p className="text-sm text-muted-foreground">
+                    Contatta un amministratore per modificare le squadre associate.
+                  </p>
+                </div>
+              )}
 
               {/* Messaggio di Errore */}
               {error && (
@@ -583,11 +572,14 @@ export function PlayerEdit() {
             <p>
               <strong>Statistiche:</strong> Punti, rimbalzi e assist per partita (opzionali)
             </p>
+            {isAdmin && (
+              <p>
+                <strong>Squadre:</strong> Modifica le squadre associate al giocatore (solo amministratori)
+              </p>
+            )}
             <p>
-              <strong>Squadre:</strong> Modifica le squadre associate al giocatore (opzionale)
-            </p>
-            <p>
-              <strong>Nota:</strong> Solo gli amministratori possono modificare giocatori
+              <strong>Nota:</strong> Puoi modificare il tuo profilo giocatore. Gli amministratori possono modificare
+              tutti i giocatori e gestire le squadre.
             </p>
           </CardContent>
         </Card>

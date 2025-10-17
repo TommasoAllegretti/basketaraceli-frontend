@@ -21,7 +21,24 @@ export function Players() {
       setLoading(true)
       setError(null)
       const data = await getPlayers()
-      setAllPlayers(data)
+
+      // Sort players to show user's own player first
+      const sortedPlayers = [...data].sort((a, b) => {
+        // If user has an associated player, put it first
+        if (user?.player_id) {
+          if (a.id === user.player_id) return -1
+          if (b.id === user.player_id) return 1
+        }
+        // Keep original order for other players
+        return 0
+      })
+
+      setAllPlayers(sortedPlayers)
+
+      // Reset to first page if user has an associated player (so they can see it immediately)
+      if (user?.player_id && data.some(player => player.id === user.player_id)) {
+        setCurrentPage(1)
+      }
     } catch (err) {
       setError('Impossibile caricare i giocatori')
       console.error('Errore nel caricamento dei giocatori:', err)
@@ -32,7 +49,7 @@ export function Players() {
 
   useEffect(() => {
     fetchPlayers()
-  }, [])
+  }, [user?.player_id])
 
   // Calculate pagination
   const totalPages = Math.ceil(allPlayers.length / playersPerPage)
@@ -187,84 +204,95 @@ export function Players() {
 
       {/* Players Grid */}
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {currentPlayers.map((player: Player) => (
-          <Card key={player.id} className="hover:shadow-md transition-shadow flex flex-col">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                {player.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col flex-1">
-              <div className="space-y-3 flex-1">
-                <div className="flex items-center gap-2 text-sm">
-                  <Hash className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">#{player.jersey_number}</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-sm">
-                  <Trophy className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">{player.position}</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-sm">
-                  <Ruler className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">{player.height_cm} cm</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 pt-2 text-xs">
-                  <div className="text-center" title="punti a partita">
-                    <div className="text-muted-foreground">PPG</div>
-                    <div className="font-medium">{player.points_per_game}</div>
+        {currentPlayers.map((player: Player) => {
+          const isCurrentUserPlayer = user?.player_id === player.id
+          return (
+            <Card
+              key={player.id}
+              className={`hover:shadow-md transition-shadow flex flex-col ${
+                isCurrentUserPlayer ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+              }`}
+            >
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  {player.name}
+                  {isCurrentUserPlayer && (
+                    <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">Il mio giocatore</span>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col flex-1">
+                <div className="space-y-3 flex-1">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Hash className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">#{player.jersey_number}</span>
                   </div>
-                  <div className="text-center" title="rimbalzi a partita">
-                    <div className="text-muted-foreground">RPG</div>
-                    <div className="font-medium">{player.rebounds_per_game}</div>
-                  </div>
-                  <div className="text-center" title="assist a partita">
-                    <div className="text-muted-foreground">APG</div>
-                    <div className="font-medium">{player.assists_per_game}</div>
-                  </div>
-                </div>
 
-                {player.teams.length > 0 && (
-                  <div className="pt-2">
-                    <div className="text-xs text-muted-foreground mb-1">Squadre:</div>
-                    <div className="flex flex-wrap gap-1">
-                      {player.teams.map(team => (
-                        <span key={team.id} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                          {team.abbreviation}
-                        </span>
-                      ))}
+                  <div className="flex items-center gap-2 text-sm">
+                    <Trophy className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">{player.position}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm">
+                    <Ruler className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">{player.height_cm} cm</span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 pt-2 text-xs">
+                    <div className="text-center" title="punti a partita">
+                      <div className="text-muted-foreground">PPG</div>
+                      <div className="font-medium">{player.points_per_game}</div>
+                    </div>
+                    <div className="text-center" title="rimbalzi a partita">
+                      <div className="text-muted-foreground">RPG</div>
+                      <div className="font-medium">{player.rebounds_per_game}</div>
+                    </div>
+                    <div className="text-center" title="assist a partita">
+                      <div className="text-muted-foreground">APG</div>
+                      <div className="font-medium">{player.assists_per_game}</div>
                     </div>
                   </div>
-                )}
-              </div>
 
-              {/* Buttons always at bottom */}
-              <div className="flex gap-2 pt-4 mt-auto">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 cursor-pointer"
-                  onClick={() => navigate(`/player?id=${player.id}`)}
-                >
-                  Vedi
-                </Button>
-                {(isAdmin || (user?.player_id && user.player_id === player.id)) && (
+                  {player.teams.length > 0 && (
+                    <div className="pt-2">
+                      <div className="text-xs text-muted-foreground mb-1">Squadre:</div>
+                      <div className="flex flex-wrap gap-1">
+                        {player.teams.map(team => (
+                          <span key={team.id} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            {team.abbreviation}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Buttons always at bottom */}
+                <div className="flex gap-2 pt-4 mt-auto">
                   <Button
                     size="sm"
                     variant="outline"
                     className="flex-1 cursor-pointer"
-                    onClick={() => navigate(`/edit-player?id=${player.id}`)}
+                    onClick={() => navigate(`/player?id=${player.id}`)}
                   >
-                    Modifica
+                    Vedi
                   </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                  {(isAdmin || (user?.player_id && user.player_id === player.id)) && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1 cursor-pointer"
+                      onClick={() => navigate(`/edit-player?id=${player.id}`)}
+                    >
+                      Modifica
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
 
       {/* Pagination */}

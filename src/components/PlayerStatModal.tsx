@@ -29,7 +29,7 @@ export function PlayerStatModal({ isOpen, onClose, playerStat, playerName }: Pla
     if (isNaN(numValue)) {
       return '0.0%'
     }
-    return Number(value).toFixed(1) + '%'
+    return numValue.toFixed(1) + '%'
   }
 
   const safeNumber = (value: number | null | undefined): number => {
