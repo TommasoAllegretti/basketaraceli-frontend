@@ -2,12 +2,26 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Trophy, ArrowLeft, Calendar, Users, Target, BarChart3, Edit, Trash2, AlertCircle, Play } from 'lucide-react'
+import {
+  Trophy,
+  ArrowLeft,
+  Calendar,
+  Users,
+  Target,
+  BarChart3,
+  Edit,
+  Trash2,
+  AlertCircle,
+  Play,
+  Calculator,
+} from 'lucide-react'
 import { getGame, deleteGame } from '@/api/gameService'
 import { getPlayers } from '@/api/playerService'
+import { getGameStats, createGameStat, updateGameStat } from '@/api/gameStatService'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Game as GameType } from '@/models/game'
 import type { Player } from '@/models/player'
+import type { CreateGameStatData, UpdateGameStatData } from '@/models/gameStat'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { ErrorDisplay } from '@/components/ErrorDisplay'
@@ -24,6 +38,8 @@ function GameContent() {
   const [error, setError] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [generateStatsLoading, setGenerateStatsLoading] = useState(false)
+  const [generateStatsSuccess, setGenerateStatsSuccess] = useState<string | null>(null)
 
   const fetchGame = async (id: number) => {
     try {
@@ -157,6 +173,141 @@ function GameContent() {
     return player ? player.name : `Giocatore #${playerId}`
   }
 
+  // Function to generate game statistics by summing player stats
+  const generateGameStats = async () => {
+    if (!game || !game.stats || game.stats.length === 0) {
+      setError('Nessuna statistica giocatore disponibile per generare le statistiche di squadra')
+      return
+    }
+
+    try {
+      setGenerateStatsLoading(true)
+      setError(null)
+      setGenerateStatsSuccess(null)
+
+      // Get existing game stats to check if we need to create or update
+      const existingGameStats = await getGameStats()
+
+      // Group player stats by team
+      const homeTeamStats = game.stats.filter(stat => {
+        const player = players.find(p => p.id === stat.player_id)
+        return player?.teams.some(team => team.id === game.home_team.id)
+      })
+
+      const awayTeamStats = game.stats.filter(stat => {
+        const player = players.find(p => p.id === stat.player_id)
+        return player?.teams.some(team => team.id === game.away_team.id)
+      })
+
+      // Function to sum team stats
+      const sumTeamStats = (teamStats: typeof game.stats) => {
+        return teamStats.reduce(
+          (sum, stat) => ({
+            points: (sum.points || 0) + (stat.points || 0),
+            field_goals_attempted: (sum.field_goals_attempted || 0) + (stat.field_goals_attempted || 0),
+            field_goals_made: (sum.field_goals_made || 0) + (stat.field_goals_made || 0),
+            three_point_field_goals_made:
+              (sum.three_point_field_goals_made || 0) + (stat.three_point_field_goals_made || 0),
+            three_point_field_goals_attempted:
+              (sum.three_point_field_goals_attempted || 0) + (stat.three_point_field_goals_attempted || 0),
+            two_point_field_goals_made: (sum.two_point_field_goals_made || 0) + (stat.two_point_field_goals_made || 0),
+            two_point_field_goals_attempted:
+              (sum.two_point_field_goals_attempted || 0) + (stat.two_point_field_goals_attempted || 0),
+            free_throws_made: (sum.free_throws_made || 0) + (stat.free_throws_made || 0),
+            free_throws_attempted: (sum.free_throws_attempted || 0) + (stat.free_throws_attempted || 0),
+            offensive_rebounds: (sum.offensive_rebounds || 0) + (stat.offensive_rebounds || 0),
+            defensive_rebounds: (sum.defensive_rebounds || 0) + (stat.defensive_rebounds || 0),
+            total_rebounds: (sum.total_rebounds || 0) + (stat.total_rebounds || 0),
+            assists: (sum.assists || 0) + (stat.assists || 0),
+            turnovers: (sum.turnovers || 0) + (stat.turnovers || 0),
+            steals: (sum.steals || 0) + (stat.steals || 0),
+            blocks: (sum.blocks || 0) + (stat.blocks || 0),
+            personal_fouls: (sum.personal_fouls || 0) + (stat.personal_fouls || 0),
+          }),
+          {
+            points: 0,
+            field_goals_attempted: 0,
+            field_goals_made: 0,
+            three_point_field_goals_made: 0,
+            three_point_field_goals_attempted: 0,
+            two_point_field_goals_made: 0,
+            two_point_field_goals_attempted: 0,
+            free_throws_made: 0,
+            free_throws_attempted: 0,
+            offensive_rebounds: 0,
+            defensive_rebounds: 0,
+            total_rebounds: 0,
+            assists: 0,
+            turnovers: 0,
+            steals: 0,
+            blocks: 0,
+            personal_fouls: 0,
+          },
+        )
+      }
+
+      // Generate stats for both teams
+      const teams = [
+        { id: game.home_team.id, name: game.home_team.name, stats: homeTeamStats },
+        { id: game.away_team.id, name: game.away_team.name, stats: awayTeamStats },
+      ]
+
+      let createdCount = 0
+      let updatedCount = 0
+
+      for (const team of teams) {
+        if (team.stats.length === 0) continue
+
+        const teamSummedStats = sumTeamStats(team.stats)
+
+        // Check if GameStat already exists for this team and game
+        const existingGameStat = existingGameStats.find(gs => gs.game_id === game.id && gs.team_id === team.id)
+
+        const gameStatData: CreateGameStatData | UpdateGameStatData = {
+          team_id: team.id,
+          game_id: game.id,
+          points: teamSummedStats.points,
+          field_goals_attempted: teamSummedStats.field_goals_attempted,
+          field_goals_made: teamSummedStats.field_goals_made,
+          three_point_field_goals_made: teamSummedStats.three_point_field_goals_made,
+          three_point_field_goals_attempted: teamSummedStats.three_point_field_goals_attempted,
+          two_point_field_goals_made: teamSummedStats.two_point_field_goals_made,
+          two_point_field_goals_attempted: teamSummedStats.two_point_field_goals_attempted,
+          free_throws_made: teamSummedStats.free_throws_made,
+          free_throws_attempted: teamSummedStats.free_throws_attempted,
+          offensive_rebounds: teamSummedStats.offensive_rebounds,
+          defensive_rebounds: teamSummedStats.defensive_rebounds,
+          total_rebounds: teamSummedStats.total_rebounds,
+          assists: teamSummedStats.assists,
+          turnovers: teamSummedStats.turnovers,
+          steals: teamSummedStats.steals,
+          blocks: teamSummedStats.blocks,
+          personal_fouls: teamSummedStats.personal_fouls,
+          // Explicitly exclude percentage fields - let backend calculate them
+        }
+
+        if (existingGameStat) {
+          // Update existing GameStat
+          await updateGameStat(existingGameStat.id, gameStatData)
+          updatedCount++
+        } else {
+          // Create new GameStat
+          await createGameStat(gameStatData)
+          createdCount++
+        }
+      }
+
+      const message =
+        `Statistiche generate con successo! ${createdCount > 0 ? `Create: ${createdCount}` : ''} ${updatedCount > 0 ? `Aggiornate: ${updatedCount}` : ''}`.trim()
+      setGenerateStatsSuccess(message)
+    } catch (err: any) {
+      console.error('Errore nella generazione delle statistiche:', err)
+      setError('Impossibile generare le statistiche di squadra. Riprova più tardi.')
+    } finally {
+      setGenerateStatsLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -184,6 +335,15 @@ function GameContent() {
           {formatDate(game.date)} alle {formatTime(game.date)}
         </p>
       </div>
+
+      {/* Success Message */}
+      {generateStatsSuccess && (
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-4">
+            <p className="text-green-800">{generateStatsSuccess}</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Game Information Grid */}
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
@@ -381,6 +541,24 @@ function GameContent() {
               >
                 <Play className="h-4 w-4 mr-2" />
                 Inizia Partita
+              </Button>
+              <Button
+                variant="outline"
+                onClick={generateGameStats}
+                disabled={generateStatsLoading || !game.stats || game.stats.length === 0}
+                className="w-full sm:w-auto touch-manipulation"
+              >
+                {generateStatsLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                    Generando...
+                  </>
+                ) : (
+                  <>
+                    <Calculator className="h-4 w-4 mr-2" />
+                    Genera statistiche partita
+                  </>
+                )}
               </Button>
               <Button
                 variant="outline"

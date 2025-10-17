@@ -82,7 +82,7 @@ function GameStatsContent() {
     if (typeof value === 'string') {
       const numValue = parseFloat(value)
       if (isNaN(numValue)) return '-'
-      return `${(numValue * 100).toFixed(1)}%`
+      return `${numValue.toFixed(1)}%`
     }
     return `${value.toFixed(1)}%`
   }
