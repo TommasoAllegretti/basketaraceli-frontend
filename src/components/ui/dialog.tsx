@@ -24,7 +24,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onOpenChange(false)
+        onOpenChange()
       }
     }
 
@@ -44,7 +44,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50" onClick={() => onOpenChange(false)} />
+      <div className="fixed inset-0 bg-black/50" onClick={() => onOpenChange()} />
       {/* Content */}
       <div className="relative z-10 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-4xl xl:max-w-6xl 2xl:max-w-7xl mx-4">
         {children}
