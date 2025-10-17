@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Trophy, ArrowLeft, Calendar, Users, Target, BarChart3, Edit, Trash2, AlertCircle, Play } from 'lucide-react'
 import { getGame, deleteGame } from '@/api/gameService'
+import { getPlayers } from '@/api/playerService'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Game as GameType } from '@/models/game'
+import type { Player } from '@/models/player'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { ErrorDisplay } from '@/components/ErrorDisplay'
@@ -17,6 +19,7 @@ function GameContent() {
   const gameId = searchParams.get('id')
 
   const [game, setGame] = useState<GameType | null>(null)
+  const [players, setPlayers] = useState<Player[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -26,8 +29,9 @@ function GameContent() {
     try {
       setLoading(true)
       setError(null)
-      const data = await getGame(id)
-      setGame(data)
+      const [gameData, playersData] = await Promise.all([getGame(id), getPlayers()])
+      setGame(gameData)
+      setPlayers(playersData)
     } catch (err: any) {
       console.error('Errore nel caricamento della partita:', err)
 
@@ -146,6 +150,12 @@ function GameContent() {
     game.home_team_second_quarter_score !== null ||
     game.home_team_third_quarter_score !== null ||
     game.home_team_fourth_quarter_score !== null
+
+  // Helper function to get player name by ID
+  const getPlayerName = (playerId: number) => {
+    const player = players.find(p => p.id === playerId)
+    return player ? player.name : `Giocatore #${playerId}`
+  }
 
   return (
     <div className="space-y-6">
@@ -326,9 +336,10 @@ function GameContent() {
               {game.stats.map(stat => (
                 <div key={stat.id} className="p-3 sm:p-4 border rounded-lg">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-sm sm:text-base truncate">Giocatore #{stat.player_id}</h3>
+                    <h3 className="font-semibold text-sm sm:text-base truncate">{getPlayerName(stat.player_id)}</h3>
                     <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex-shrink-0">
-                      {Math.floor((stat.seconds_played ?? 0) / 60)}:{(stat.seconds_played ?? 0) % 60}min
+                      {Math.floor((stat.seconds_played ?? 0) / 60)}:
+                      {String((stat.seconds_played ?? 0) % 60).padStart(2, '0')}min
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-sm">
