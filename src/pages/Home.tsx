@@ -1,22 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import {
-  Users,
-  Trophy,
-  BarChart3,
-  Calendar,
-  Shield,
-  Target,
-  Plus,
-  Eye,
-  UserPlus,
-  CalendarPlus,
-  TrendingUp,
-} from 'lucide-react'
+import { Users, Trophy, BarChart3, Calendar, Shield, Target, Plus, Eye, UserPlus, CalendarPlus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function Home() {
   const navigate = useNavigate()
+  const { isAdmin, user } = useAuth()
 
   return (
     <div className="space-y-6">
@@ -27,7 +17,7 @@ export function Home() {
       </div>
 
       {/* Navigation Cards */}
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
         <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/teams')}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -63,18 +53,6 @@ export function Home() {
             <p className="text-sm text-muted-foreground">Visualizza e programma le partite</p>
           </CardContent>
         </Card>
-
-        <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/game-stats')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-purple-600" />
-              Statistiche
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">Visualizza statistiche delle partite</p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Action Cards */}
@@ -92,14 +70,18 @@ export function Home() {
               <Eye className="h-4 w-4 mr-2" />
               Visualizza Squadre
             </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/team-create')}>
-              <Plus className="h-4 w-4 mr-2" />
-              Crea Nuova Squadra
-            </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/clubs')}>
-              <Trophy className="h-4 w-4 mr-2" />
-              Gestisci Società
-            </Button>
+            {isAdmin && (
+              <>
+                <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/create-team')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Crea Nuova Squadra
+                </Button>
+                <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/clubs')}>
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Gestisci Società
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -116,14 +98,28 @@ export function Home() {
               <Eye className="h-4 w-4 mr-2" />
               Visualizza Giocatori
             </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/player-create')}>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Aggiungi Giocatore
-            </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/leagues')}>
-              <Trophy className="h-4 w-4 mr-2" />
-              Gestisci Campionati
-            </Button>
+            {user?.player_id && (
+              <Button
+                className="w-full justify-start"
+                variant="outline"
+                onClick={() => navigate(`/player?id=${user.player_id}`)}
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Il Mio Profilo Giocatore
+              </Button>
+            )}
+            {isAdmin && (
+              <>
+                <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/create-player')}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Aggiungi Giocatore
+                </Button>
+                <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/leagues')}>
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Gestisci Campionati
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -132,7 +128,7 @@ export function Home() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-orange-600" />
-              Partite & Statistiche
+              Partite
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -140,42 +136,42 @@ export function Home() {
               <Eye className="h-4 w-4 mr-2" />
               Visualizza Partite
             </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/game-create')}>
-              <CalendarPlus className="h-4 w-4 mr-2" />
-              Programma Partita
-            </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/game-stats')}>
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Statistiche Partite
-            </Button>
+            {isAdmin && (
+              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/create-game')}>
+                <CalendarPlus className="h-4 w-4 mr-2" />
+                Programma Partita
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
 
       {/* Additional Navigation */}
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5" />
-              Organizzazione
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/clubs')}>
-              <Shield className="h-4 w-4 mr-2" />
-              Gestisci Società
-            </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/leagues')}>
-              <Trophy className="h-4 w-4 mr-2" />
-              Gestisci Campionati
-            </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/club-create')}>
-              <Plus className="h-4 w-4 mr-2" />
-              Crea Nuova Società
-            </Button>
-          </CardContent>
-        </Card>
+      <div className={`grid gap-4 grid-cols-1 ${isAdmin ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Trophy className="h-5 w-5" />
+                Organizzazione
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/clubs')}>
+                <Shield className="h-4 w-4 mr-2" />
+                Gestisci Società
+              </Button>
+              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/leagues')}>
+                <Trophy className="h-4 w-4 mr-2" />
+                Gestisci Campionati
+              </Button>
+              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/create-club')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Crea Nuova Società
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader>
@@ -185,18 +181,26 @@ export function Home() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/game-stat-create')}>
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Inserisci Statistiche
-            </Button>
             <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/profile')}>
               <Users className="h-4 w-4 mr-2" />
               Il Mio Profilo
             </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/league-create')}>
-              <Plus className="h-4 w-4 mr-2" />
-              Crea Nuova Lega
-            </Button>
+            {user?.player_id && (
+              <Button
+                className="w-full justify-start"
+                variant="outline"
+                onClick={() => navigate(`/player-stat?id=${user.player_id}`)}
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Le Mie Statistiche
+              </Button>
+            )}
+            {isAdmin && (
+              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/create-league')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Crea Nuova Lega
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
