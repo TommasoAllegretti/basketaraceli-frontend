@@ -51,3 +51,11 @@ export const getPlayerStats = async (params: GetPlayerStatsRequest): Promise<Get
   const response = await api.get('/player-stats', { params })
   return response.data
 }
+
+/**
+ * Get detailed player statistics for a specific player
+ */
+export const getPlayerDetailedStats = async (playerId: number) => {
+  const response = await api.get(`/player-stats/player/${playerId}`)
+  return response.data
+}

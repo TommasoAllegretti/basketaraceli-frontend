@@ -22,6 +22,7 @@ import { LeagueEdit } from './pages/LeagueEdit'
 import { League } from './pages/League'
 import { PlayerCreate } from './pages/PlayerCreate'
 import { PlayerEdit } from './pages/PlayerEdit'
+import { PlayerStat } from './pages/PlayerStat'
 import { ForgotPassword } from './pages/ForgotPassword'
 import { ResetPassword } from './pages/ResetPassword'
 import { Games } from './pages/Games'
@@ -56,6 +57,7 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/players" element={<Players />} />
                     <Route path="/player" element={<Player />} />
+                    <Route path="/player-stat" element={<PlayerStat />} />
                     <Route path="/create-player" element={<PlayerCreate />} />
                     <Route path="/edit-player" element={<PlayerEdit />} />
                     <Route path="/teams" element={<Teams />} />

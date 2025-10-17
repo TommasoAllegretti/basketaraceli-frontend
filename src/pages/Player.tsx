@@ -14,6 +14,7 @@ import {
   HandHeart,
   Trash2,
   AlertCircle,
+  BarChart3,
 } from 'lucide-react'
 import { getPlayer, deletePlayer } from '@/api/playerService'
 import { useAuth } from '@/contexts/AuthContext'
@@ -315,7 +316,10 @@ export function Player() {
                 Elimina
               </Button>
             )}
-            <Button variant="outline">Visualizza Statistiche</Button>
+            <Button variant="outline" onClick={() => navigate(`/player-stat?id=${player.id}`)}>
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Visualizza Statistiche
+            </Button>
             <Button variant="outline">Gestisci Squadre</Button>
           </div>
         </CardContent>
