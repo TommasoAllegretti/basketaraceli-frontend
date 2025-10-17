@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { User, Mail, Calendar, Shield, UserCircle } from 'lucide-react'
+import { User, Mail, Shield, UserCircle, Hash } from 'lucide-react'
 import { getCurrentUser } from '@/api/authService'
 import type { User as UserType } from '@/models/user'
 
@@ -27,14 +27,6 @@ export function Profile() {
     fetchUser()
   }, [])
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('it-IT', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
-
   if (loading) {
     return (
       <div className="space-y-6">
@@ -43,15 +35,6 @@ export function Profile() {
           <p className="text-muted-foreground">Le tue informazioni</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
-          <Card>
-            <CardContent className="p-6">
-              <div className="animate-pulse space-y-4">
-                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-              </div>
-            </CardContent>
-          </Card>
           <Card>
             <CardContent className="p-6">
               <div className="animate-pulse space-y-4">
@@ -129,41 +112,21 @@ export function Profile() {
                 <p className="text-sm text-muted-foreground">{user.admin === 1 ? 'Admin' : 'User'}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Account Details Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Dettagli account
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-sm font-medium">User ID</p>
-              <p className="text-sm text-muted-foreground">#{user.id}</p>
-            </div>
             {user.player_id && (
-              <div>
-                <p className="text-sm font-medium">Player ID</p>
-                <p
-                  className="text-sm underline hover:no-underline cursor-pointer text-blue-500"
-                  onClick={() => (window.location.href = `/admin/player?id=${user.player_id}`)}
-                >
-                  #{user.player_id}
-                </p>
+              <div className="flex items-center gap-3">
+                <Hash className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">Player ID</p>
+                  <p
+                    className="text-sm text-blue-500 underline hover:no-underline cursor-pointer"
+                    onClick={() => (window.location.href = `/admin/player?id=${user.player_id}`)}
+                  >
+                    #{user.player_id}
+                  </p>
+                </div>
               </div>
             )}
-            <div>
-              <p className="text-sm font-medium">Membro da</p>
-              <p className="text-sm text-muted-foreground">{formatDate(user.created_at)}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium">Ultimo aggiornamento</p>
-              <p className="text-sm text-muted-foreground">{formatDate(user.updated_at)}</p>
-            </div>
           </CardContent>
         </Card>
       </div>
