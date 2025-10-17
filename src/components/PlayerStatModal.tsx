@@ -2,40 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Target, TrendingUp, HandHeart, Activity, Award, Clock, BarChart3 } from 'lucide-react'
-
-interface PlayerStat {
-  id: number
-  player_id: number
-  game_id: number
-  seconds_played: number
-  points: number
-  field_goals_made: number
-  field_goals_attempted: number
-  field_goal_percentage: number | null
-  three_point_field_goals_made: number
-  three_point_field_goals_attempted: number
-  three_point_field_goal_percentage: number | null
-  two_point_field_goals_made: number
-  two_point_field_goals_attempted: number
-  two_point_field_goal_percentage: number | null
-  free_throws_made: number
-  free_throws_attempted: number
-  free_throw_percentage: number | null
-  offensive_rebounds: number
-  defensive_rebounds: number
-  total_rebounds: number
-  assists: number
-  turnovers: number
-  steals: number
-  blocks: number
-  personal_fouls: number
-  performance_index_rating: number | null
-  efficiency: number | null
-  plus_minus: number | null
-  created_at: string
-  updated_at: string
-  deleted_at: string | null
-}
+import type { PlayerStat } from '@/models/game'
 
 interface PlayerStatModalProps {
   isOpen: boolean
@@ -47,14 +14,19 @@ interface PlayerStatModalProps {
 export function PlayerStatModal({ isOpen, onClose, playerStat, playerName }: PlayerStatModalProps) {
   if (!playerStat) return null
 
-  const formatTime = (seconds: number) => {
+  const formatTime = (seconds: number | null) => {
+    if (seconds === null || seconds === undefined) return '0:00'
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
-  const formatPercentage = (value: number | null | undefined) => {
-    if (value === null || value === undefined || isNaN(Number(value))) {
+  const formatPercentage = (value: string | number | null | undefined) => {
+    if (value === null || value === undefined) {
+      return '0.0%'
+    }
+    const numValue = typeof value === 'string' ? parseFloat(value) : value
+    if (isNaN(numValue)) {
       return '0.0%'
     }
     return Number(value).toFixed(1) + '%'

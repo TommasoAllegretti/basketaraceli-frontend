@@ -99,14 +99,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive('/admin/game-stats')}>
-                    <a href="/admin/game-stats">
-                      <BarChart3 />
-                      <span>Statistiche</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive('/admin/profile')}>
                     <a href="/admin/profile">
