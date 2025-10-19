@@ -82,8 +82,9 @@ function LiveGameContent() {
   const [error, setError] = useState<string | null>(null)
   const [selectedTeam, setSelectedTeam] = useState<'home' | 'away'>('home')
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null)
-  const [playerStats, setPlayerStats] = useState<Record<number, PlayerStat>>({})
-  const [actionLoading, setActionLoading] = useState(false)
+  const [playerStats, setPlayerStats] = useState<Record<number, PlayerStat>>({} as Record<number, PlayerStat>)
+  const [actionLoading, setActionLoading] = useState<Record<ActionType, boolean>>({} as Record<ActionType, boolean>)
+  const [undoLoading, setUndoLoading] = useState(false)
   const [lastAction, setLastAction] = useState<{ action: ActionType; player_id: number } | null>(null)
   const [gameTime, setGameTime] = useState(0) // in seconds
   const [isGameRunning, setIsGameRunning] = useState(false)
@@ -242,7 +243,7 @@ function LiveGameContent() {
     if (!selectedPlayer || !gameId) return
 
     try {
-      setActionLoading(true)
+      setActionLoading(prev => ({ ...prev, [action]: true }))
 
       const result = await recordPlayerAction({
         game_id: parseInt(gameId),
@@ -264,7 +265,7 @@ function LiveGameContent() {
       console.error('Error recording action:', err)
       setError("Errore nel registrare l'azione")
     } finally {
-      setActionLoading(false)
+      setActionLoading(prev => ({ ...prev, [action]: false }))
     }
   }
 
@@ -272,7 +273,7 @@ function LiveGameContent() {
     if (!lastAction || !gameId) return
 
     try {
-      setActionLoading(true)
+      setUndoLoading(true)
 
       const result = await undoPlayerAction({
         game_id: parseInt(gameId),
@@ -294,7 +295,7 @@ function LiveGameContent() {
       console.error('Error undoing action:', err)
       setError("Errore nell'annullare l'azione")
     } finally {
-      setActionLoading(false)
+      setUndoLoading(false)
     }
   }
 
@@ -539,7 +540,7 @@ function LiveGameContent() {
                 Azioni - {teamPlayers.find(p => p.id === selectedPlayer)?.name || `Giocatore #${selectedPlayer}`}
               </span>
               {lastAction && (
-                <Button variant="outline" size="sm" onClick={undoLastAction} disabled={actionLoading}>
+                <Button variant="outline" size="sm" onClick={undoLastAction} disabled={undoLoading}>
                   <RotateCcw className="h-4 w-4 mr-2" />
                   Annulla
                 </Button>
@@ -552,7 +553,7 @@ function LiveGameContent() {
                 <Button
                   key={button.action}
                   onClick={() => recordAction(button.action)}
-                  disabled={actionLoading}
+                  disabled={actionLoading[button.action] || false}
                   className={`h-16 text-white ${button.color}`}
                 >
                   <div className="text-center">
