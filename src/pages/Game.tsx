@@ -525,57 +525,58 @@ function GameContent() {
 
                   <div className="grid gap-3 sm:gap-4 lg:grid-cols-2 xl:grid-cols-4">
                     {(() => {
-                      // Calculate best players for each stat
+                      // Helper function to find all players with the highest value for a stat
+                      const findBestPlayers = (statKey: keyof PlayerStat) => {
+                        if (!game.stats || game.stats.length === 0) return []
+                        const maxValue = Math.max(...game.stats.map(stat => (stat[statKey] as number) ?? 0))
+                        return game.stats.filter(stat => (stat[statKey] as number) === maxValue && maxValue > 0)
+                      }
+
+                      // Helper function for percentage stats with minimum attempts
+                      const findBestPercentagePlayers = (
+                        percentageKey: keyof PlayerStat,
+                        attemptsKey: keyof PlayerStat,
+                        minAttempts: number,
+                      ) => {
+                        if (!game.stats || game.stats.length === 0) return []
+                        const eligibleStats = game.stats.filter(
+                          stat => stat[attemptsKey] && ((stat[attemptsKey] as number) ?? 0) >= minAttempts,
+                        )
+                        if (eligibleStats.length === 0) return []
+
+                        const maxPercentage = Math.max(
+                          ...eligibleStats.map(stat => parseFloat((stat[percentageKey] as string) ?? '0')),
+                        )
+                        return eligibleStats.filter(
+                          stat => parseFloat((stat[percentageKey] as string) ?? '0') === maxPercentage,
+                        )
+                      }
+
+                      // Calculate best players for each stat (now returns arrays)
                       const bestPlayers = {
-                        points: game.stats.reduce((best, current) =>
-                          (current.points ?? 0) > (best.points ?? 0) ? current : best,
+                        points: findBestPlayers('points'),
+                        total_rebounds: findBestPlayers('total_rebounds'),
+                        assists: findBestPlayers('assists'),
+                        steals: findBestPlayers('steals'),
+                        blocks: findBestPlayers('blocks'),
+                        field_goal_percentage: findBestPercentagePlayers(
+                          'field_goal_percentage',
+                          'field_goals_attempted',
+                          5,
                         ),
-                        total_rebounds: game.stats.reduce((best, current) =>
-                          (current.total_rebounds ?? 0) > (best.total_rebounds ?? 0) ? current : best,
+                        three_point_field_goal_percentage: findBestPercentagePlayers(
+                          'three_point_field_goal_percentage',
+                          'three_point_field_goals_attempted',
+                          3,
                         ),
-                        assists: game.stats.reduce((best, current) =>
-                          (current.assists ?? 0) > (best.assists ?? 0) ? current : best,
-                        ),
-                        steals: game.stats.reduce((best, current) =>
-                          (current.steals ?? 0) > (best.steals ?? 0) ? current : best,
-                        ),
-                        blocks: game.stats.reduce((best, current) =>
-                          (current.blocks ?? 0) > (best.blocks ?? 0) ? current : best,
-                        ),
-                        field_goal_percentage: game.stats
-                          .filter(stat => stat.field_goals_attempted && (stat.field_goals_attempted ?? 0) >= 5) // Minimum 5 attempts
-                          .reduce(
-                            (best, current) =>
-                              parseFloat(current.field_goal_percentage ?? '0') >
-                              parseFloat(best.field_goal_percentage ?? '0')
-                                ? current
-                                : best,
-                            game.stats[0],
-                          ),
-                        three_point_field_goal_percentage: game.stats
-                          .filter(
-                            stat =>
-                              stat.three_point_field_goals_attempted &&
-                              (stat.three_point_field_goals_attempted ?? 0) >= 3,
-                          ) // Minimum 3 attempts
-                          .reduce(
-                            (best, current) =>
-                              parseFloat(current.three_point_field_goal_percentage ?? '0') >
-                              parseFloat(best.three_point_field_goal_percentage ?? '0')
-                                ? current
-                                : best,
-                            game.stats[0],
-                          ),
-                        efficiency: game.stats.reduce((best, current) =>
-                          (current.efficiency ?? 0) > (best.efficiency ?? 0) ? current : best,
-                        ),
+                        efficiency: findBestPlayers('efficiency'),
                       }
 
                       const statCards = [
                         {
                           title: 'Punti',
-                          player: bestPlayers.points,
-                          value: bestPlayers.points.points ?? 0,
+                          players: bestPlayers.points,
+                          getValue: (player: PlayerStat) => player.points ?? 0,
                           suffix: 'punti',
                           bgColor: 'bg-blue-100',
                           textColor: 'text-blue-600',
@@ -583,8 +584,8 @@ function GameContent() {
                         },
                         {
                           title: 'Rimbalzi',
-                          player: bestPlayers.total_rebounds,
-                          value: bestPlayers.total_rebounds.total_rebounds ?? 0,
+                          players: bestPlayers.total_rebounds,
+                          getValue: (player: PlayerStat) => player.total_rebounds ?? 0,
                           suffix: 'rimbalzi',
                           bgColor: 'bg-green-100',
                           textColor: 'text-green-600',
@@ -592,8 +593,8 @@ function GameContent() {
                         },
                         {
                           title: 'Assist',
-                          player: bestPlayers.assists,
-                          value: bestPlayers.assists.assists ?? 0,
+                          players: bestPlayers.assists,
+                          getValue: (player: PlayerStat) => player.assists ?? 0,
                           suffix: 'assist',
                           bgColor: 'bg-purple-100',
                           textColor: 'text-purple-600',
@@ -601,8 +602,8 @@ function GameContent() {
                         },
                         {
                           title: 'Palle Rubate',
-                          player: bestPlayers.steals,
-                          value: bestPlayers.steals.steals ?? 0,
+                          players: bestPlayers.steals,
+                          getValue: (player: PlayerStat) => player.steals ?? 0,
                           suffix: 'palle rubate',
                           bgColor: 'bg-orange-100',
                           textColor: 'text-orange-600',
@@ -610,8 +611,8 @@ function GameContent() {
                         },
                         {
                           title: 'Stoppate',
-                          player: bestPlayers.blocks,
-                          value: bestPlayers.blocks.blocks ?? 0,
+                          players: bestPlayers.blocks,
+                          getValue: (player: PlayerStat) => player.blocks ?? 0,
                           suffix: 'stoppate',
                           bgColor: 'bg-red-100',
                           textColor: 'text-red-600',
@@ -619,38 +620,30 @@ function GameContent() {
                         },
                         {
                           title: '% Tiri dal Campo',
-                          player: bestPlayers.field_goal_percentage,
-                          value: bestPlayers.field_goal_percentage?.field_goal_percentage
-                            ? parseFloat(bestPlayers.field_goal_percentage.field_goal_percentage).toFixed(1)
-                            : '0.0',
+                          players: bestPlayers.field_goal_percentage,
+                          getValue: (player: PlayerStat) =>
+                            player.field_goal_percentage ? parseFloat(player.field_goal_percentage).toFixed(1) : '0.0',
                           suffix: '%',
                           bgColor: 'bg-indigo-100',
                           textColor: 'text-indigo-600',
                           icon: '🎯',
-                          condition:
-                            bestPlayers.field_goal_percentage?.field_goals_attempted &&
-                            (bestPlayers.field_goal_percentage.field_goals_attempted ?? 0) >= 5,
                         },
                         {
                           title: '% Tiri da 3pt',
-                          player: bestPlayers.three_point_field_goal_percentage,
-                          value: bestPlayers.three_point_field_goal_percentage?.three_point_field_goal_percentage
-                            ? parseFloat(
-                                bestPlayers.three_point_field_goal_percentage.three_point_field_goal_percentage,
-                              ).toFixed(1)
-                            : '0.0',
+                          players: bestPlayers.three_point_field_goal_percentage,
+                          getValue: (player: PlayerStat) =>
+                            player.three_point_field_goal_percentage
+                              ? parseFloat(player.three_point_field_goal_percentage).toFixed(1)
+                              : '0.0',
                           suffix: '%',
                           bgColor: 'bg-teal-100/50',
                           textColor: 'text-teal-600',
                           icon: '🏹',
-                          condition:
-                            bestPlayers.three_point_field_goal_percentage?.three_point_field_goals_attempted &&
-                            (bestPlayers.three_point_field_goal_percentage.three_point_field_goals_attempted ?? 0) >= 3,
                         },
                         {
                           title: 'Efficienza',
-                          player: bestPlayers.efficiency,
-                          value: bestPlayers.efficiency.efficiency ?? 0,
+                          players: bestPlayers.efficiency,
+                          getValue: (player: PlayerStat) => player.efficiency ?? 0,
                           suffix: 'PIR',
                           bgColor: 'bg-yellow-100',
                           textColor: 'text-yellow-600',
@@ -659,20 +652,26 @@ function GameContent() {
                       ]
 
                       return statCards
-                        .filter(card => card.condition !== false && card.value !== 0 && card.value !== '0.0')
+                        .filter(
+                          card =>
+                            card.players.length > 0 &&
+                            card.getValue(card.players[0]) !== 0 &&
+                            card.getValue(card.players[0]) !== '0.0',
+                        )
                         .map((card, index) => (
                           <div
                             key={index}
-                            className={`p-3 sm:p-4 ${card.bgColor} rounded-lg cursor-pointer hover:shadow-md transition-all duration-200`}
-                            onClick={() => handlePlayerStatClick(card.player)}
+                            className={`p-3 sm:p-4 ${card.bgColor} rounded-lg transition-all duration-200`}
                           >
                             <div className="text-center">
                               <div className="text-2xl mb-2">{card.icon}</div>
                               <div className={`text-xl sm:text-2xl font-bold ${card.textColor} mb-1`}>
-                                {card.value} {card.suffix}
+                                {card.getValue(card.players[0])} {card.suffix}
                               </div>
                               <div className="text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                                {getPlayerName(card.player.player_id)}
+                                {card.players.length === 1
+                                  ? getPlayerName(card.players[0].player_id)
+                                  : card.players.map(player => getPlayerName(player.player_id)).join(', ')}
                               </div>
                               <div className="text-xs text-muted-foreground">{card.title}</div>
                             </div>
