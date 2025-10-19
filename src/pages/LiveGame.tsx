@@ -5,7 +5,11 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, Play, Pause, RotateCcw, Users, Trophy, Timer } from 'lucide-react'
 import { getGame } from '@/api/gameService'
 import { getPlayers } from '@/api/playerService'
-import { recordAction as recordPlayerAction, undoAction as undoPlayerAction } from '@/api/playerStatService'
+import {
+  recordAction as recordPlayerAction,
+  undoAction as undoPlayerAction,
+  getPlayerStats,
+} from '@/api/playerStatService'
 import type { Game as GameType } from '@/models/game'
 import type { Player } from '@/models/player'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -181,12 +185,32 @@ function LiveGameContent() {
     }
   }
 
+  const fetchPlayerStats = async (gameId: number) => {
+    try {
+      const response = await getPlayerStats({ game_id: gameId })
+      if (response.success && response.stats) {
+        // Convert array of stats to a record keyed by player_id
+        const statsRecord: Record<number, PlayerStat> = {}
+        response.stats.forEach((stat: PlayerStat) => {
+          if (stat.player_id) {
+            statsRecord[stat.player_id] = stat
+          }
+        })
+        setPlayerStats(statsRecord)
+      }
+    } catch (err: unknown) {
+      console.error('Errore nel caricamento delle statistiche:', err)
+      // Don't set error here as it's not critical for the main functionality
+    }
+  }
+
   useEffect(() => {
     if (gameId) {
       const id = parseInt(gameId, 10)
       if (!isNaN(id)) {
         fetchGame(id)
         fetchPlayers()
+        fetchPlayerStats(id)
       } else {
         setError('ID partita non valido')
         setLoading(false)
