@@ -439,6 +439,254 @@ function GameContent() {
         </Card>
       )}
 
+      {/* Best Players by Stat */}
+      {game.stats && game.stats.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5" />
+              Migliori Giocatori per Statistica
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {(() => {
+              // Calculate MVP based on a weighted scoring system
+              const calculateMVPScore = (stat: PlayerStat) => {
+                const points = stat.points ?? 0
+                const rebounds = stat.total_rebounds ?? 0
+                const assists = stat.assists ?? 0
+                const steals = stat.steals ?? 0
+                const blocks = stat.blocks ?? 0
+                const efficiency = stat.efficiency ?? 0
+                const turnovers = stat.turnovers ?? 0
+                const fouls = stat.personal_fouls ?? 0
+
+                // Weighted scoring: points (1x), rebounds (1.2x), assists (1.5x), steals (2x), blocks (2x), efficiency (0.5x)
+                // Subtract penalties for turnovers and fouls
+                return (
+                  points * 1.0 +
+                  rebounds * 1.2 +
+                  assists * 1.5 +
+                  steals * 2.0 +
+                  blocks * 2.0 +
+                  efficiency * 0.5 -
+                  turnovers * 1.0 -
+                  fouls * 0.5
+                )
+              }
+
+              const mvpPlayer = game.stats.reduce((mvp, current) =>
+                calculateMVPScore(current) > calculateMVPScore(mvp) ? current : mvp,
+              )
+
+              const mvpScore = calculateMVPScore(mvpPlayer)
+
+              return (
+                <>
+                  {/* MVP Section */}
+                  <div className="mb-6 p-4 sm:p-6 bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-200 rounded-lg">
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-2 mb-3">
+                        <div className="text-3xl">👑</div>
+                        <h3 className="text-lg sm:text-xl font-bold text-yellow-700">MVP della Partita</h3>
+                        <div className="text-3xl">👑</div>
+                      </div>
+                      <div
+                        className="cursor-pointer hover:bg-yellow-100 rounded-lg p-3 transition-all duration-200"
+                        onClick={() => handlePlayerStatClick(mvpPlayer)}
+                      >
+                        <div className="text-2xl sm:text-3xl font-bold text-yellow-600 mb-2">
+                          {getPlayerName(mvpPlayer.player_id)}
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                          <div className="text-center">
+                            <div className="font-bold text-lg text-blue-600">{mvpPlayer.points ?? 0}</div>
+                            <div className="text-xs text-muted-foreground">Punti</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-bold text-lg text-green-600">{mvpPlayer.total_rebounds ?? 0}</div>
+                            <div className="text-xs text-muted-foreground">Rimbalzi</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-bold text-lg text-purple-600">{mvpPlayer.assists ?? 0}</div>
+                            <div className="text-xs text-muted-foreground">Assist</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-bold text-lg text-yellow-600">{mvpPlayer.efficiency ?? 0}</div>
+                            <div className="text-xs text-muted-foreground">Efficienza</div>
+                          </div>
+                        </div>
+                        <div className="mt-3 text-xs text-muted-foreground">
+                          Punteggio MVP: {mvpScore.toFixed(1)} • Clicca per vedere tutte le statistiche
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:gap-4 lg:grid-cols-2 xl:grid-cols-4">
+                    {(() => {
+                      // Calculate best players for each stat
+                      const bestPlayers = {
+                        points: game.stats.reduce((best, current) =>
+                          (current.points ?? 0) > (best.points ?? 0) ? current : best,
+                        ),
+                        total_rebounds: game.stats.reduce((best, current) =>
+                          (current.total_rebounds ?? 0) > (best.total_rebounds ?? 0) ? current : best,
+                        ),
+                        assists: game.stats.reduce((best, current) =>
+                          (current.assists ?? 0) > (best.assists ?? 0) ? current : best,
+                        ),
+                        steals: game.stats.reduce((best, current) =>
+                          (current.steals ?? 0) > (best.steals ?? 0) ? current : best,
+                        ),
+                        blocks: game.stats.reduce((best, current) =>
+                          (current.blocks ?? 0) > (best.blocks ?? 0) ? current : best,
+                        ),
+                        field_goal_percentage: game.stats
+                          .filter(stat => stat.field_goals_attempted && (stat.field_goals_attempted ?? 0) >= 5) // Minimum 5 attempts
+                          .reduce(
+                            (best, current) =>
+                              parseFloat(current.field_goal_percentage ?? '0') >
+                              parseFloat(best.field_goal_percentage ?? '0')
+                                ? current
+                                : best,
+                            game.stats[0],
+                          ),
+                        three_point_field_goal_percentage: game.stats
+                          .filter(
+                            stat =>
+                              stat.three_point_field_goals_attempted &&
+                              (stat.three_point_field_goals_attempted ?? 0) >= 3,
+                          ) // Minimum 3 attempts
+                          .reduce(
+                            (best, current) =>
+                              parseFloat(current.three_point_field_goal_percentage ?? '0') >
+                              parseFloat(best.three_point_field_goal_percentage ?? '0')
+                                ? current
+                                : best,
+                            game.stats[0],
+                          ),
+                        efficiency: game.stats.reduce((best, current) =>
+                          (current.efficiency ?? 0) > (best.efficiency ?? 0) ? current : best,
+                        ),
+                      }
+
+                      const statCards = [
+                        {
+                          title: 'Punti',
+                          player: bestPlayers.points,
+                          value: bestPlayers.points.points ?? 0,
+                          suffix: 'punti',
+                          bgColor: 'bg-blue-100',
+                          textColor: 'text-blue-600',
+                          icon: '🏀',
+                        },
+                        {
+                          title: 'Rimbalzi',
+                          player: bestPlayers.total_rebounds,
+                          value: bestPlayers.total_rebounds.total_rebounds ?? 0,
+                          suffix: 'rimbalzi',
+                          bgColor: 'bg-green-100',
+                          textColor: 'text-green-600',
+                          icon: '🤾',
+                        },
+                        {
+                          title: 'Assist',
+                          player: bestPlayers.assists,
+                          value: bestPlayers.assists.assists ?? 0,
+                          suffix: 'assist',
+                          bgColor: 'bg-purple-100',
+                          textColor: 'text-purple-600',
+                          icon: '🤝',
+                        },
+                        {
+                          title: 'Palle Rubate',
+                          player: bestPlayers.steals,
+                          value: bestPlayers.steals.steals ?? 0,
+                          suffix: 'palle rubate',
+                          bgColor: 'bg-orange-100',
+                          textColor: 'text-orange-600',
+                          icon: '🥷',
+                        },
+                        {
+                          title: 'Stoppate',
+                          player: bestPlayers.blocks,
+                          value: bestPlayers.blocks.blocks ?? 0,
+                          suffix: 'stoppate',
+                          bgColor: 'bg-red-100',
+                          textColor: 'text-red-600',
+                          icon: '🛡️',
+                        },
+                        {
+                          title: '% Tiri dal Campo',
+                          player: bestPlayers.field_goal_percentage,
+                          value: bestPlayers.field_goal_percentage?.field_goal_percentage
+                            ? parseFloat(bestPlayers.field_goal_percentage.field_goal_percentage).toFixed(1)
+                            : '0.0',
+                          suffix: '%',
+                          bgColor: 'bg-indigo-100',
+                          textColor: 'text-indigo-600',
+                          icon: '🎯',
+                          condition:
+                            bestPlayers.field_goal_percentage?.field_goals_attempted &&
+                            (bestPlayers.field_goal_percentage.field_goals_attempted ?? 0) >= 5,
+                        },
+                        {
+                          title: '% Tiri da 3pt',
+                          player: bestPlayers.three_point_field_goal_percentage,
+                          value: bestPlayers.three_point_field_goal_percentage?.three_point_field_goal_percentage
+                            ? parseFloat(
+                                bestPlayers.three_point_field_goal_percentage.three_point_field_goal_percentage,
+                              ).toFixed(1)
+                            : '0.0',
+                          suffix: '%',
+                          bgColor: 'bg-teal-100/50',
+                          textColor: 'text-teal-600',
+                          icon: '🏹',
+                          condition:
+                            bestPlayers.three_point_field_goal_percentage?.three_point_field_goals_attempted &&
+                            (bestPlayers.three_point_field_goal_percentage.three_point_field_goals_attempted ?? 0) >= 3,
+                        },
+                        {
+                          title: 'Efficienza',
+                          player: bestPlayers.efficiency,
+                          value: bestPlayers.efficiency.efficiency ?? 0,
+                          suffix: 'PIR',
+                          bgColor: 'bg-yellow-100',
+                          textColor: 'text-yellow-600',
+                          icon: '⭐',
+                        },
+                      ]
+
+                      return statCards
+                        .filter(card => card.condition !== false && card.value !== 0 && card.value !== '0.0')
+                        .map((card, index) => (
+                          <div
+                            key={index}
+                            className={`p-3 sm:p-4 ${card.bgColor} rounded-lg cursor-pointer hover:shadow-md transition-all duration-200`}
+                            onClick={() => handlePlayerStatClick(card.player)}
+                          >
+                            <div className="text-center">
+                              <div className="text-2xl mb-2">{card.icon}</div>
+                              <div className={`text-xl sm:text-2xl font-bold ${card.textColor} mb-1`}>
+                                {card.value} {card.suffix}
+                              </div>
+                              <div className="text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                                {getPlayerName(card.player.player_id)}
+                              </div>
+                              <div className="text-xs text-muted-foreground">{card.title}</div>
+                            </div>
+                          </div>
+                        ))
+                    })()}
+                  </div>
+                </>
+              )
+            })()}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Player Statistics */}
       {game.stats && game.stats.length > 0 && (
         <Card>
