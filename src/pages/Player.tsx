@@ -2,20 +2,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import {
-  Users,
-  ArrowLeft,
-  Calendar,
-  Trophy,
-  Hash,
-  Ruler,
-  Target,
-  TrendingUp,
-  HandHeart,
-  Trash2,
-  AlertCircle,
-  BarChart3,
-} from 'lucide-react'
+import { Users, ArrowLeft, Calendar, Trophy, Hash, Ruler, Trash2, AlertCircle, BarChart3 } from 'lucide-react'
 import { getPlayer, deletePlayer } from '@/api/playerService'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Player as PlayerType } from '@/models/player'
@@ -176,127 +163,87 @@ export function Player() {
         </h1>
       </div>
 
-      {/* Player Information Grid */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Basic Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Informazioni
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Hash className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Numero di maglia</p>
-                <p className="text-sm text-muted-foreground">#{player.jersey_number}</p>
-              </div>
+      {/* Player Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Informazioni
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Hash className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <p className="text-sm font-medium">Numero di maglia</p>
+              <p className="text-sm text-muted-foreground">#{player.jersey_number}</p>
             </div>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <Trophy className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Posizione</p>
-                <p className="text-sm text-muted-foreground">{player.position}</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <Trophy className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <p className="text-sm font-medium">Posizione</p>
+              <p className="text-sm text-muted-foreground">{player.position}</p>
             </div>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <Ruler className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Altezza</p>
-                <p className="text-sm text-muted-foreground">{player.height_cm} cm</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <Ruler className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <p className="text-sm font-medium">Altezza</p>
+              <p className="text-sm text-muted-foreground">{player.height_cm} cm</p>
             </div>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Data di nascita</p>
-                <p className="text-sm text-muted-foreground">
-                  {formatDate(player.birth_date)} ({calculateAge(player.birth_date)} anni)
-                </p>
-              </div>
+          <div className="flex items-center gap-3">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <p className="text-sm font-medium">Data di nascita</p>
+              <p className="text-sm text-muted-foreground">
+                {formatDate(player.birth_date)} ({calculateAge(player.birth_date)} anni)
+              </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Statistics */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Statistiche
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <div className="flex items-center justify-center mb-2">
-                  <Target className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="text-2xl font-bold text-blue-600">{player.points_per_game}</div>
-                <div className="text-xs text-muted-foreground">Punti a partita</div>
-              </div>
-
-              <div className="p-3 bg-green-50 rounded-lg">
-                <div className="flex items-center justify-center mb-2">
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="text-2xl font-bold text-green-600">{player.rebounds_per_game}</div>
-                <div className="text-xs text-muted-foreground">Rimbalzi a partita</div>
-              </div>
-
-              <div className="p-3 bg-purple-50 rounded-lg">
-                <div className="flex items-center justify-center mb-2">
-                  <HandHeart className="h-4 w-4 text-purple-600" />
-                </div>
-                <div className="text-2xl font-bold text-purple-600">{player.assists_per_game}</div>
-                <div className="text-xs text-muted-foreground">Assist a partita</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Teams */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5" />
-              Squadre ({player.teams.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {player.teams.length > 0 ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                {player.teams.map(team => (
-                  <div key={team.id} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold">{team.name}</h3>
-                      <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">{team.abbreviation}</span>
-                    </div>
-                    <div className="space-y-1 text-sm text-muted-foreground">
-                      <p>
-                        <strong>Società:</strong> {team.club.name}
-                      </p>
-                      <p>
-                        <strong>Categoria:</strong> {team.league.name}
-                      </p>
-                    </div>
+      {/* Teams */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5" />
+            Squadre ({player.teams.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {player.teams.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              {player.teams.map(team => (
+                <div key={team.id} className="p-4 border rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold">{team.name}</h3>
+                    <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">{team.abbreviation}</span>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Nessuna squadra</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                  <div className="space-y-1 text-sm text-muted-foreground">
+                    <p>
+                      <strong>Società:</strong> {team.club.name}
+                    </p>
+                    <p>
+                      <strong>Categoria:</strong> {team.league.name}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">Nessuna squadra</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Actions */}
       <Card>
