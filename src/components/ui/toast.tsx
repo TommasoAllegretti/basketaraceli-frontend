@@ -48,7 +48,7 @@ export function ToastComponent({ toast, onRemove }: ToastProps) {
   )
 }
 
-export function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: () => void }) {
+export function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: any }) {
   return (
     <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
       {toasts.map(toast => (

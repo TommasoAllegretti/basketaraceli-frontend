@@ -1,13 +1,6 @@
 import * as React from 'react'
 import { type Toast, ToastContainer } from '../components/ui/toast'
-
-interface ToastContextType {
-  showToast: (message: string, options?: Partial<Omit<Toast, 'id' | 'message'>>) => void
-  removeToast: (id: string) => void
-  toasts: Toast[]
-}
-
-const ToastContext = React.createContext<ToastContextType | undefined>(undefined)
+import { ToastContext } from '../hooks/useToast'
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<Toast[]>([])
@@ -44,12 +37,4 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>
   )
-}
-
-export function useToast() {
-  const context = React.useContext(ToastContext)
-  if (context === undefined) {
-    throw new Error('useToast must be used within a ToastProvider')
-  }
-  return context
 }

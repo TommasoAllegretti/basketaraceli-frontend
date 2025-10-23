@@ -1,4 +1,4 @@
-import { useToast } from '../contexts/ToastContext'
+import { useToast } from './useToast'
 
 export function useToastHelpers() {
   const { showToast } = useToast()
