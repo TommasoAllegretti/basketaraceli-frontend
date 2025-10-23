@@ -18,6 +18,7 @@ import { Login } from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ThemeProvider } from './components/theme-provider'
 import { AuthProvider } from './contexts/AuthContext'
+import { ToastProvider } from './contexts/ToastContext'
 import { LeagueEdit } from './pages/LeagueEdit'
 import { League } from './pages/League'
 import { PlayerCreate } from './pages/PlayerCreate'
@@ -36,51 +37,53 @@ function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <AuthProvider>
-        <BrowserRouter basename="/admin">
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+        <ToastProvider>
+          <BrowserRouter basename="/admin">
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
-            {/* Protected Routes */}
-            <Route
-              path="/*"
-              element={
-                <ProtectedRoute>
-                  <Routes>
-                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                    <Route path="/dashboard" element={<Home />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/players" element={<Players />} />
-                    <Route path="/player" element={<Player />} />
-                    <Route path="/player-stat" element={<PlayerStat />} />
-                    <Route path="/create-player" element={<PlayerCreate />} />
-                    <Route path="/edit-player" element={<PlayerEdit />} />
-                    <Route path="/teams" element={<Teams />} />
-                    <Route path="/team" element={<Team />} />
-                    <Route path="/create-team" element={<TeamCreate />} />
-                    <Route path="/edit-team" element={<TeamEdit />} />
-                    <Route path="/clubs" element={<Clubs />} />
-                    <Route path="/club" element={<Club />} />
-                    <Route path="/create-club" element={<ClubCreate />} />
-                    <Route path="/edit-club" element={<ClubEdit />} />
-                    <Route path="/leagues" element={<Leagues />} />
-                    <Route path="/league" element={<League />} />
-                    <Route path="/create-league" element={<LeagueCreate />} />
-                    <Route path="/edit-league" element={<LeagueEdit />} />
-                    <Route path="/games" element={<Games />} />
-                    <Route path="/game" element={<Game />} />
-                    <Route path="/create-game" element={<GameCreate />} />
-                    <Route path="/edit-game" element={<GameEdit />} />
+              {/* Protected Routes */}
+              <Route
+                path="/*"
+                element={
+                  <ProtectedRoute>
+                    <Routes>
+                      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                      <Route path="/dashboard" element={<Home />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/players" element={<Players />} />
+                      <Route path="/player" element={<Player />} />
+                      <Route path="/player-stat" element={<PlayerStat />} />
+                      <Route path="/create-player" element={<PlayerCreate />} />
+                      <Route path="/edit-player" element={<PlayerEdit />} />
+                      <Route path="/teams" element={<Teams />} />
+                      <Route path="/team" element={<Team />} />
+                      <Route path="/create-team" element={<TeamCreate />} />
+                      <Route path="/edit-team" element={<TeamEdit />} />
+                      <Route path="/clubs" element={<Clubs />} />
+                      <Route path="/club" element={<Club />} />
+                      <Route path="/create-club" element={<ClubCreate />} />
+                      <Route path="/edit-club" element={<ClubEdit />} />
+                      <Route path="/leagues" element={<Leagues />} />
+                      <Route path="/league" element={<League />} />
+                      <Route path="/create-league" element={<LeagueCreate />} />
+                      <Route path="/edit-league" element={<LeagueEdit />} />
+                      <Route path="/games" element={<Games />} />
+                      <Route path="/game" element={<Game />} />
+                      <Route path="/create-game" element={<GameCreate />} />
+                      <Route path="/edit-game" element={<GameEdit />} />
 
-                    <Route path="/live-game" element={<LiveGame />} />
-                  </Routes>
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </BrowserRouter>
+                      <Route path="/live-game" element={<LiveGame />} />
+                    </Routes>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </BrowserRouter>
+        </ToastProvider>
       </AuthProvider>
     </ThemeProvider>
   )

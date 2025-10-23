@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Play, Pause, RotateCcw, Users, Trophy, Timer } from 'lucide-react'
+import { ArrowLeft, Play, Pause, RotateCcw, Users, Trophy, Timer, Loader2 } from 'lucide-react'
 import { getGame } from '@/api/gameService'
 import { getPlayers } from '@/api/playerService'
 import {
@@ -15,6 +15,7 @@ import type { Player } from '@/models/player'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { ErrorDisplay } from '@/components/ErrorDisplay'
+import { useToastHelpers } from '@/hooks/useToastHelpers'
 
 // Types for player stats
 interface PlayerStat {
@@ -73,7 +74,22 @@ interface ActionButton {
 function LiveGameContent() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { showSuccess, showError, showCustom } = useToastHelpers()
   const gameId = searchParams.get('id')
+
+  // Function to convert button color to toast color
+  const getToastColorFromButtonColor = (buttonColor: string): string => {
+    const colorMap: Record<string, string> = {
+      'bg-green-500 hover:bg-green-600': 'bg-green-50 text-green-800 border-l-4 border-green-500',
+      'bg-red-500 hover:bg-red-600': 'bg-red-50 text-red-800 border-l-4 border-red-500',
+      'bg-orange-500 hover:bg-orange-600': 'bg-orange-50 text-orange-800 border-l-4 border-orange-500',
+      'bg-blue-500 hover:bg-blue-600': 'bg-blue-50 text-blue-800 border-l-4 border-blue-500',
+      'bg-purple-500 hover:bg-purple-600': 'bg-purple-50 text-purple-800 border-l-4 border-purple-500',
+      'bg-yellow-500 hover:bg-yellow-600': 'bg-yellow-50 text-yellow-800 border-l-4 border-yellow-500',
+      'bg-indigo-500 hover:bg-indigo-600': 'bg-indigo-50 text-indigo-800 border-l-4 border-indigo-500',
+    }
+    return colorMap[buttonColor] || 'bg-gray-50 text-gray-800 border-l-4 border-gray-500'
+  }
 
   const [game, setGame] = useState<GameType | null>(null)
   const [players, setPlayers] = useState<Player[]>([])
@@ -224,7 +240,7 @@ function LiveGameContent() {
 
   // Game timer effect
   useEffect(() => {
-    let interval: any
+    let interval: unknown
     if (isGameRunning) {
       interval = setInterval(() => {
         setGameTime(prev => prev + 1)
@@ -241,6 +257,8 @@ function LiveGameContent() {
 
   const recordAction = async (action: ActionType) => {
     if (!selectedPlayer || !gameId) return
+
+    const playerName = teamPlayers.find(p => p.id === selectedPlayer)?.name || `Giocatore #${selectedPlayer}`
 
     try {
       setActionLoading(prev => ({ ...prev, [action]: true }))
@@ -260,9 +278,21 @@ function LiveGameContent() {
 
         // Set last action for undo functionality
         setLastAction({ action, player_id: selectedPlayer })
+
+        // Show success toast with action details and matching color
+        const actionButton = actionButtons.find(btn => btn.action === action)
+        const actionLabel = actionButton?.label || action
+        const toastColor = actionButton ? getToastColorFromButtonColor(actionButton.color) : undefined
+
+        if (toastColor) {
+          showCustom(`${actionLabel} registrato per ${playerName}`, toastColor)
+        } else {
+          showSuccess(`${actionLabel} registrato per ${playerName}`)
+        }
       }
     } catch (err) {
       console.error('Error recording action:', err)
+      showError(`Errore nel registrare l'azione per ${playerName}`)
       setError("Errore nel registrare l'azione")
     } finally {
       setActionLoading(prev => ({ ...prev, [action]: false }))
@@ -271,6 +301,9 @@ function LiveGameContent() {
 
   const undoLastAction = async () => {
     if (!lastAction || !gameId) return
+
+    const playerName = players.find(p => p.id === lastAction.player_id)?.name || `Giocatore #${lastAction.player_id}`
+    const actionLabel = actionButtons.find(btn => btn.action === lastAction.action)?.label || lastAction.action
 
     try {
       setUndoLoading(true)
@@ -290,9 +323,25 @@ function LiveGameContent() {
 
         // Clear last action
         setLastAction(null)
+
+        // Show undo toast with matching color (slightly muted for undo)
+        const actionButton = actionButtons.find(btn => btn.action === lastAction.action)
+        const toastColor = actionButton ? getToastColorFromButtonColor(actionButton.color) : undefined
+
+        if (toastColor) {
+          // Use a slightly muted version for undo (replace border with gray but keep background color)
+          const undoColor = toastColor.replace(/border-l-4 border-\w+-500/, 'border-l-4 border-gray-400')
+          showCustom(`${actionLabel} annullato per ${playerName}`, undoColor)
+        } else {
+          showCustom(
+            `${actionLabel} annullato per ${playerName}`,
+            'bg-gray-50 text-gray-800 border-l-4 border-gray-400',
+          )
+        }
       }
     } catch (err) {
       console.error('Error undoing action:', err)
+      showError(`Errore nell'annullare l'azione per ${playerName}`)
       setError("Errore nell'annullare l'azione")
     } finally {
       setUndoLoading(false)
@@ -541,8 +590,12 @@ function LiveGameContent() {
               </span>
               {lastAction && (
                 <Button variant="outline" size="sm" onClick={undoLastAction} disabled={undoLoading}>
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Annulla
+                  {undoLoading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                  )}
+                  {undoLoading ? 'Annullando...' : 'Annulla'}
                 </Button>
               )}
             </CardTitle>
@@ -554,12 +607,20 @@ function LiveGameContent() {
                   key={button.action}
                   onClick={() => recordAction(button.action)}
                   disabled={actionLoading[button.action] || false}
-                  className={`h-16 text-white ${button.color}`}
+                  className={`h-16 text-white ${button.color} ${actionLoading[button.action] ? 'opacity-75' : ''}`}
                 >
                   <div className="text-center">
-                    {button.icon}
-                    <div className="text-xs mt-1">{button.label}</div>
-                    {button.points && <div className="text-xs opacity-75">+{button.points}pt</div>}
+                    {actionLoading[button.action] ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+                      </>
+                    ) : (
+                      <>
+                        {button.icon}
+                        <div className="text-xs mt-1">{button.label}</div>
+                        {button.points && <div className="text-xs opacity-75">+{button.points}pt</div>}
+                      </>
+                    )}
                   </div>
                 </Button>
               ))}

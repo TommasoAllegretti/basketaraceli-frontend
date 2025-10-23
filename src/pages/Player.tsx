@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Users, ArrowLeft, Calendar, Trophy, Hash, Ruler, Trash2, AlertCircle, BarChart3 } from 'lucide-react'
 import { getPlayer, deletePlayer } from '@/api/playerService'
 import { useAuth } from '@/contexts/AuthContext'
+import { useToastHelpers } from '@/hooks/useToastHelpers'
 import type { Player as PlayerType } from '@/models/player'
 
 export function Player() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { isAdmin, user } = useAuth()
+  const { showSuccess, showError } = useToastHelpers()
   const playerId = searchParams.get('id')
 
   const [player, setPlayer] = useState<PlayerType | null>(null)
@@ -79,10 +81,11 @@ export function Player() {
     try {
       setDeleteLoading(true)
       await deletePlayer(player.id)
+      showSuccess('Giocatore eliminato con successo!')
       navigate('/players')
     } catch (err: any) {
       console.error("Errore nell'eliminazione del giocatore:", err)
-      setError('Impossibile eliminare il giocatore. Riprova più tardi.')
+      showError('Impossibile eliminare il giocatore. Riprova più tardi.')
     } finally {
       setDeleteLoading(false)
       setShowDeleteConfirm(false)
