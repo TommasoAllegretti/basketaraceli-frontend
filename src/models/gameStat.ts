@@ -82,7 +82,7 @@ export interface CreateGameStatData {
   personal_fouls?: number | null
 }
 
-export interface UpdateGameStatData extends CreateGameStatData {}
+export type UpdateGameStatData = CreateGameStatData
 
 export interface CreateGameStatResponse {
   success: boolean

@@ -243,7 +243,7 @@ function LiveGameContent() {
 
   // Game timer effect
   useEffect(() => {
-    let interval: unknown
+    let interval: any
     if (isGameRunning) {
       interval = setInterval(() => {
         setGameTime(prev => prev + 1)
