@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Play, Pause, RotateCcw, Users, Trophy, Timer, Loader2 } from 'lucide-react'
+import { ArrowLeft, Play, Pause, RotateCcw, Users, Trophy, Timer, Loader2, BarChart3 } from 'lucide-react'
 import { getGame } from '@/api/gameService'
 import { getPlayers } from '@/api/playerService'
 import {
@@ -10,6 +10,8 @@ import {
   undoAction as undoPlayerAction,
   getPlayerStats,
 } from '@/api/playerStatService'
+import { createGameStat, updateGameStat, getGameStats } from '@/api/gameStatService'
+import type { CreateGameStatData } from '@/models/gameStat'
 import type { Game as GameType } from '@/models/game'
 import type { Player } from '@/models/player'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -105,6 +107,7 @@ function LiveGameContent() {
   const [gameTime, setGameTime] = useState(0) // in seconds
   const [isGameRunning, setIsGameRunning] = useState(false)
   const [quarter, setQuarter] = useState(1)
+  const [generateStatsLoading, setGenerateStatsLoading] = useState(false)
 
   // Action buttons configuration
   const actionButtons: ActionButton[] = [
@@ -240,7 +243,7 @@ function LiveGameContent() {
 
   // Game timer effect
   useEffect(() => {
-    let interval: any
+    let interval: unknown
     if (isGameRunning) {
       interval = setInterval(() => {
         setGameTime(prev => prev + 1)
@@ -453,6 +456,106 @@ function LiveGameContent() {
     return Object.values(playerStats)
       .filter(stat => stat.game_id === game?.id && awayPlayerIds.includes(stat.player_id))
       .reduce((total, stat) => total + (stat.points || 0), 0)
+  }
+
+  // Calculate comprehensive team statistics
+  const calculateTeamStats = (teamId: number) => {
+    const teamPlayerIds = players
+      .filter(player => player.teams.some(team => team.id === teamId))
+      .map(player => player.id)
+
+    const teamPlayerStats = Object.values(playerStats).filter(
+      stat => stat.game_id === game?.id && teamPlayerIds.includes(stat.player_id),
+    )
+
+    const stats = {
+      points: teamPlayerStats.reduce((sum, stat) => sum + (stat.points || 0), 0),
+      field_goals_made: teamPlayerStats.reduce((sum, stat) => sum + (stat.field_goals_made || 0), 0),
+      field_goals_attempted: teamPlayerStats.reduce((sum, stat) => sum + (stat.field_goals_attempted || 0), 0),
+      three_point_field_goals_made: teamPlayerStats.reduce(
+        (sum, stat) => sum + (stat.three_point_field_goals_made || 0),
+        0,
+      ),
+      three_point_field_goals_attempted: teamPlayerStats.reduce(
+        (sum, stat) => sum + (stat.three_point_field_goals_attempted || 0),
+        0,
+      ),
+      two_point_field_goals_made: teamPlayerStats.reduce(
+        (sum, stat) => sum + (stat.two_point_field_goals_made || 0),
+        0,
+      ),
+      two_point_field_goals_attempted: teamPlayerStats.reduce(
+        (sum, stat) => sum + (stat.two_point_field_goals_attempted || 0),
+        0,
+      ),
+      free_throws_made: teamPlayerStats.reduce((sum, stat) => sum + (stat.free_throws_made || 0), 0),
+      free_throws_attempted: teamPlayerStats.reduce((sum, stat) => sum + (stat.free_throws_attempted || 0), 0),
+      offensive_rebounds: teamPlayerStats.reduce((sum, stat) => sum + (stat.offensive_rebounds || 0), 0),
+      defensive_rebounds: teamPlayerStats.reduce((sum, stat) => sum + (stat.defensive_rebounds || 0), 0),
+      total_rebounds: teamPlayerStats.reduce((sum, stat) => sum + (stat.total_rebounds || 0), 0),
+      assists: teamPlayerStats.reduce((sum, stat) => sum + (stat.assists || 0), 0),
+      turnovers: teamPlayerStats.reduce((sum, stat) => sum + (stat.turnovers || 0), 0),
+      steals: teamPlayerStats.reduce((sum, stat) => sum + (stat.steals || 0), 0),
+      blocks: teamPlayerStats.reduce((sum, stat) => sum + (stat.blocks || 0), 0),
+      personal_fouls: teamPlayerStats.reduce((sum, stat) => sum + (stat.personal_fouls || 0), 0),
+    }
+
+    return stats
+  }
+
+  // Generate game statistics for both teams
+  const generateGameStats = async () => {
+    if (!game || !gameId) return
+
+    try {
+      setGenerateStatsLoading(true)
+
+      // Calculate stats for both teams
+      const homeTeamStats = calculateTeamStats(game.home_team.id)
+      const awayTeamStats = calculateTeamStats(game.away_team.id)
+
+      // Check if game stats already exist
+      const existingGameStats = await getGameStats()
+      const existingHomeStats = existingGameStats.find(
+        stat => stat.game_id === game.id && stat.team_id === game.home_team.id,
+      )
+      const existingAwayStats = existingGameStats.find(
+        stat => stat.game_id === game.id && stat.team_id === game.away_team.id,
+      )
+
+      // Create or update home team stats
+      const homeStatsData: CreateGameStatData = {
+        team_id: game.home_team.id,
+        game_id: game.id,
+        ...homeTeamStats,
+      }
+
+      if (existingHomeStats) {
+        await updateGameStat(existingHomeStats.id, homeStatsData)
+      } else {
+        await createGameStat(homeStatsData)
+      }
+
+      // Create or update away team stats
+      const awayStatsData: CreateGameStatData = {
+        team_id: game.away_team.id,
+        game_id: game.id,
+        ...awayTeamStats,
+      }
+
+      if (existingAwayStats) {
+        await updateGameStat(existingAwayStats.id, awayStatsData)
+      } else {
+        await createGameStat(awayStatsData)
+      }
+
+      showSuccess('Statistiche di squadra generate con successo!')
+    } catch (error) {
+      console.error('Error generating game stats:', error)
+      showError('Errore nella generazione delle statistiche di squadra')
+    } finally {
+      setGenerateStatsLoading(false)
+    }
   }
 
   return (
@@ -711,16 +814,31 @@ function LiveGameContent() {
                 </Button>
               ))}
             </div>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setGameTime(0)
-                setIsGameRunning(false)
-              }}
-            >
-              <Timer className="h-4 w-4 mr-2" />
-              Reset Timer
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setGameTime(0)
+                  setIsGameRunning(false)
+                }}
+              >
+                <Timer className="h-4 w-4 mr-2" />
+                Reset Timer
+              </Button>
+              <Button
+                variant="default"
+                onClick={generateGameStats}
+                disabled={generateStatsLoading}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {generateStatsLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                )}
+                {generateStatsLoading ? 'Generando...' : 'Genera statistiche'}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
