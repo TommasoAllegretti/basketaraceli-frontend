@@ -192,14 +192,27 @@ function LiveGameContent() {
     }
   }
 
-  const fetchPlayers = async () => {
+  const fetchActivePlayers = async (gameId: number) => {
     try {
       setPlayersLoading(true)
-      const data = await getPlayers()
-      setPlayers(data)
+      const response = await getPlayerStats({ game_id: gameId })
+      if (response.success && response.stats) {
+        // Extract unique player IDs from PlayerStats
+        const activePlayerIds = [...new Set(response.stats.map((stat: any) => stat.player_id))]
+
+        // Fetch full player data for active players only
+        const allPlayers = await getPlayers()
+        const activePlayers = allPlayers.filter(player => activePlayerIds.includes(player.id))
+
+        setPlayers(activePlayers)
+      } else {
+        // If no PlayerStats exist, set empty players array
+        setPlayers([])
+      }
     } catch (err: unknown) {
-      console.error('Errore nel caricamento dei giocatori:', err)
-      // Don't set error here as it's not critical for the main functionality
+      console.error('Errore nel caricamento dei giocatori attivi:', err)
+      // Set empty players array on error
+      setPlayers([])
     } finally {
       setPlayersLoading(false)
     }
@@ -229,7 +242,7 @@ function LiveGameContent() {
       const id = parseInt(gameId, 10)
       if (!isNaN(id)) {
         fetchGame(id)
-        fetchPlayers()
+        fetchActivePlayers(id)
         fetchPlayerStats(id)
       } else {
         setError('ID partita non valido')
@@ -675,7 +688,10 @@ function LiveGameContent() {
               ) : (
                 <div className="col-span-full text-center py-8">
                   <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-sm text-muted-foreground">Nessun giocatore trovato per questa squadra</p>
+                  <p className="text-sm text-muted-foreground">Nessun giocatore selezionato per questa squadra</p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Seleziona i giocatori dalla schermata di configurazione partita
+                  </p>
                 </div>
               )}
             </div>

@@ -6,14 +6,25 @@ import { Trophy, ArrowLeft, Calendar, Users, Target, BarChart3, Edit, Trash2, Al
 import { getGame, deleteGame } from '@/api/gameService'
 import { getPlayers } from '@/api/playerService'
 import { getGameStats } from '@/api/gameStatService'
+import { getPlayerStats } from '@/api/playerStatService'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Game as GameType, PlayerStat } from '@/models/game'
 import type { Player } from '@/models/player'
 import type { GameStat } from '@/models/gameStat'
+
+interface ExistingPlayerStat {
+  player_id: number
+  game_id: number
+  points?: number
+  assists?: number
+  rebounds?: number
+}
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LoadingSkeleton } from '@/components/LoadingSkeleton'
 import { ErrorDisplay } from '@/components/ErrorDisplay'
 import { PlayerStatModal } from '@/components/PlayerStatModal'
+import { PlayerSelectionModal } from '@/components/PlayerSelectionModal'
+import { initializePlayerStats } from '@/api/playerStatService'
 
 function GameContent() {
   const [searchParams] = useSearchParams()
@@ -24,6 +35,7 @@ function GameContent() {
   const [game, setGame] = useState<GameType | null>(null)
   const [players, setPlayers] = useState<Player[]>([])
   const [gameStats, setGameStats] = useState<GameStat[]>([])
+  const [existingPlayerStats, setExistingPlayerStats] = useState<ExistingPlayerStat[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -31,6 +43,11 @@ function GameContent() {
 
   const [selectedPlayerStat, setSelectedPlayerStat] = useState<PlayerStat | null>(null)
   const [isPlayerStatModalOpen, setIsPlayerStatModalOpen] = useState(false)
+
+  // Player selection modal state
+  const [isPlayerSelectionModalOpen, setIsPlayerSelectionModalOpen] = useState(false)
+  const [playerSelectionLoading, setPlayerSelectionLoading] = useState(false)
+  const [, setPlayerSelectionError] = useState<string | null>(null)
 
   const fetchGame = async (id: number) => {
     try {
@@ -41,6 +58,19 @@ function GameContent() {
       setPlayers(playersData)
       // Filter game stats for this specific game
       setGameStats(gameStatsData.filter(stat => stat.game_id === id))
+
+      // Fetch existing PlayerStats for this game
+      try {
+        const playerStatsResponse = await getPlayerStats({ game_id: id })
+        if (playerStatsResponse.success && playerStatsResponse.stats) {
+          setExistingPlayerStats(playerStatsResponse.stats)
+        } else {
+          setExistingPlayerStats([])
+        }
+      } catch {
+        console.log('No existing PlayerStats found for this game')
+        setExistingPlayerStats([])
+      }
     } catch (err: unknown) {
       console.error('Errore nel caricamento della partita:', err)
 
@@ -176,6 +206,49 @@ function GameContent() {
   const closePlayerStatModal = () => {
     setIsPlayerStatModalOpen(false)
     setSelectedPlayerStat(null)
+  }
+
+  // Handle start game button click - opens player selection modal
+  const handleStartGame = () => {
+    setPlayerSelectionError(null)
+    setIsPlayerSelectionModalOpen(true)
+  }
+
+  // Handle player selection confirmation
+  const handlePlayerSelectionConfirm = async (selectedPlayerIds: number[]) => {
+    if (!game) return
+
+    try {
+      setPlayerSelectionLoading(true)
+      setPlayerSelectionError(null)
+
+      const response = await initializePlayerStats({
+        game_id: game.id,
+        player_ids: selectedPlayerIds,
+      })
+
+      // Show success feedback if needed
+      if (response.success) {
+        setIsPlayerSelectionModalOpen(false)
+        navigate(`/live-game?id=${game.id}`)
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Errore durante la creazione delle statistiche giocatori. Riprova.'
+      setPlayerSelectionError(errorMessage)
+      console.error('Error initializing player stats:', err)
+      throw err // Re-throw to let the modal handle the error display
+    } finally {
+      setPlayerSelectionLoading(false)
+    }
+  }
+
+  // Close player selection modal
+  const closePlayerSelectionModal = () => {
+    if (!playerSelectionLoading) {
+      setIsPlayerSelectionModalOpen(false)
+      setPlayerSelectionError(null)
+    }
   }
 
   return (
@@ -746,10 +819,7 @@ function GameContent() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Button
-                onClick={() => navigate(`/live-game?id=${game.id}`)}
-                className="w-full sm:w-auto touch-manipulation"
-              >
+              <Button onClick={handleStartGame} className="w-full sm:w-auto touch-manipulation">
                 <Play className="h-4 w-4 mr-2" />
                 Inizia Partita
               </Button>
@@ -831,6 +901,17 @@ function GameContent() {
         onClose={closePlayerStatModal}
         playerStat={selectedPlayerStat}
         playerName={selectedPlayerStat ? getPlayerName(selectedPlayerStat.player_id) : ''}
+      />
+
+      {/* Player Selection Modal */}
+      <PlayerSelectionModal
+        isOpen={isPlayerSelectionModalOpen}
+        onClose={closePlayerSelectionModal}
+        onConfirm={handlePlayerSelectionConfirm}
+        game={game}
+        players={players}
+        loading={playerSelectionLoading}
+        existingPlayerStats={existingPlayerStats}
       />
     </div>
   )
