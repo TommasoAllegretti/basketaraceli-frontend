@@ -13,6 +13,8 @@ dist-ssr
 *.local
 .env
 .kiro
+.github
+coverage
 
 # Editor directories and files
 .vscode/*
