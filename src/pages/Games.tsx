@@ -25,7 +25,24 @@ function GamesContent() {
       setLoading(true)
       setError(null)
       const data = await getGames()
-      setAllGames(data)
+      // Sort games: played games (newest first), then upcoming games (closest first)
+      const sortedGames = data.sort((a, b) => {
+        const aPlayed = a.home_team_total_score !== null || a.away_team_total_score !== null
+        const bPlayed = b.home_team_total_score !== null || b.away_team_total_score !== null
+        const aDate = new Date(a.date).getTime()
+        const bDate = new Date(b.date).getTime()
+
+        // If both played or both not played, sort by date
+        if (aPlayed === bPlayed) {
+          // For played games, newest first (descending)
+          // For upcoming games, closest first (ascending)
+          return aPlayed ? bDate - aDate : aDate - bDate
+        }
+
+        // Played games come first
+        return aPlayed ? -1 : 1
+      })
+      setAllGames(sortedGames)
     } catch (err: any) {
       console.error('Errore nel caricamento delle partite:', err)
 
