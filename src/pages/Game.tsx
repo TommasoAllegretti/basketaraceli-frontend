@@ -14,13 +14,12 @@ import {
   AlertCircle,
   Play,
   FileDown,
-  FileText,
 } from 'lucide-react'
 import { getGame, deleteGame } from '@/api/gameService'
 import { getPlayers } from '@/api/playerService'
 import { getGameStats } from '@/api/gameStatService'
 import { getPlayerStats } from '@/api/playerStatService'
-import { downloadGameStatsPdf, streamGameStatsPdf, getPdfErrorMessage } from '@/api/pdfService'
+import { downloadGameStatsPdf, getPdfErrorMessage } from '@/api/pdfService'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToastHelpers } from '@/hooks/useToastHelpers'
 import type { Game as GameType, PlayerStat } from '@/models/game'
@@ -67,7 +66,6 @@ function GameContent() {
 
   // PDF generation state
   const [pdfDownloadLoading, setPdfDownloadLoading] = useState(false)
-  const [pdfViewLoading, setPdfViewLoading] = useState(false)
 
   const fetchGame = async (id: number) => {
     try {
@@ -304,42 +302,6 @@ function GameContent() {
       showError(errorMessage)
     } finally {
       setPdfDownloadLoading(false)
-    }
-  }
-
-  // Handle PDF View (Stream)
-  const handleViewPdf = async () => {
-    if (!game || gameStats.length === 0 || !game.stats || game.stats.length === 0) {
-      showError('Impossibile generare il PDF: statistiche di gioco non disponibili')
-      return
-    }
-
-    try {
-      setPdfViewLoading(true)
-
-      // Use the first game stat
-      const gameStatId = gameStats[0].id
-
-      // Get all player stat IDs from the game
-      const playerStatIds = game.stats.map(stat => stat.id)
-
-      if (playerStatIds.length === 0) {
-        showError('Nessuna statistica giocatore disponibile per il PDF')
-        return
-      }
-
-      await streamGameStatsPdf({
-        game_stat_id: gameStatId,
-        player_stat_ids: playerStatIds,
-      })
-
-      showSuccess('PDF aperto in una nuova finestra!')
-    } catch (err: unknown) {
-      console.error('Error viewing PDF:', err)
-      const errorMessage = getPdfErrorMessage(err)
-      showError(errorMessage)
-    } finally {
-      setPdfViewLoading(false)
     }
   }
 
@@ -924,6 +886,28 @@ function GameContent() {
                 <Edit className="h-4 w-4 mr-2" />
                 Modifica Partita
               </Button>
+
+              {gameStats.length > 0 && game.stats && game.stats.length > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={handleDownloadPdf}
+                  disabled={pdfDownloadLoading}
+                  className="w-full sm:w-auto touch-manipulation"
+                >
+                  {pdfDownloadLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
+                      Generazione PDF...
+                    </>
+                  ) : (
+                    <>
+                      <FileDown className="h-4 w-4 mr-2" />
+                      Scarica PDF
+                    </>
+                  )}
+                </Button>
+              )}
+
               <Button
                 variant="destructive"
                 onClick={() => setShowDeleteConfirm(true)}
@@ -934,59 +918,6 @@ function GameContent() {
                 Elimina
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* PDF Export Actions */}
-      {gameStats.length > 0 && game.stats && game.stats.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Esporta PDF</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Button
-                variant="default"
-                onClick={handleDownloadPdf}
-                disabled={pdfDownloadLoading || pdfViewLoading}
-                className="w-full sm:w-auto touch-manipulation"
-              >
-                {pdfDownloadLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Generazione PDF...
-                  </>
-                ) : (
-                  <>
-                    <FileDown className="h-4 w-4 mr-2" />
-                    Scarica PDF
-                  </>
-                )}
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={handleViewPdf}
-                disabled={pdfDownloadLoading || pdfViewLoading}
-                className="w-full sm:w-auto touch-manipulation"
-              >
-                {pdfViewLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
-                    Apertura PDF...
-                  </>
-                ) : (
-                  <>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Visualizza PDF
-                  </>
-                )}
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground mt-3">
-              Il PDF include le statistiche di squadra e di tutti i {game.stats.length} giocatori della partita.
-            </p>
           </CardContent>
         </Card>
       )}
