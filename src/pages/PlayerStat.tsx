@@ -216,7 +216,12 @@ export function PlayerStat() {
             </div>
             <div className="text-center p-4 bg-yellow-50 rounded-lg">
               <div className="text-3xl font-bold text-yellow-600">
-                {playerStats.totals.averages.efficiency.toFixed(1)}
+                {playerStats.stats.length > 0
+                  ? (
+                      playerStats.stats.reduce((sum, stat) => sum + calculateEfficiency(stat), 0) /
+                      playerStats.stats.length
+                    ).toFixed(1)
+                  : '0.0'}
               </div>
               <div className="text-sm text-muted-foreground">Efficienza Media</div>
             </div>
