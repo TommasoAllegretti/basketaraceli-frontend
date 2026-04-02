@@ -2,18 +2,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import {
-  BarChart3,
-  ArrowLeft,
-  Calendar,
-  Trophy,
-  Target,
-  TrendingUp,
-  HandHeart,
-  Users,
-  Activity,
-  Award,
-} from 'lucide-react'
+import { BarChart3, ArrowLeft, Calendar, Trophy, TrendingUp, Users, Award } from 'lucide-react'
 import { getPlayerDetailedStats } from '@/api/playerStatService'
 import type { PlayerStatsResponse } from '@/models/playerStat'
 import { calculateEfficiency, calculatePIR } from '@/lib/advancedStats'
