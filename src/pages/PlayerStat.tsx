@@ -237,7 +237,7 @@ export function PlayerStat() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="text-center p-4 bg-blue-50 rounded-lg">
               <div className="text-3xl font-bold text-blue-600">{playerStats.totals.games_played}</div>
               <div className="text-sm text-muted-foreground">Partite Giocate</div>
@@ -246,31 +246,72 @@ export function PlayerStat() {
               <div className="text-3xl font-bold text-green-600">{playerStats.totals.totals.points}</div>
               <div className="text-sm text-muted-foreground">Punti Totali</div>
             </div>
+          </div>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-3xl font-bold text-blue-600">
+                {playerStats.totals.totals.field_goals_made}/{playerStats.totals.totals.field_goals_attempted}
+              </div>
+              <div className="text-sm text-muted-foreground">Tiri dal Campo</div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-3xl font-bold text-green-600">
+                {playerStats.totals.totals.two_point_field_goals_made}/
+                {playerStats.totals.totals.two_point_field_goals_attempted}
+              </div>
+              <div className="text-sm text-muted-foreground">Tiri da 2</div>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-3xl font-bold text-purple-600">
+                {playerStats.totals.totals.three_point_field_goals_made}/
+                {playerStats.totals.totals.three_point_field_goals_attempted}
+              </div>
+              <div className="text-sm text-muted-foreground">Tiri da 3</div>
+            </div>
+            <div className="text-center p-4 bg-orange-50 rounded-lg">
+              <div className="text-3xl font-bold text-orange-600">
+                {playerStats.totals.totals.free_throws_made}/{playerStats.totals.totals.free_throws_attempted}
+              </div>
+              <div className="text-sm text-muted-foreground">Tiri Liberi</div>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-3xl font-bold text-purple-600">{playerStats.totals.totals.assists}</div>
+              <div className="text-sm text-muted-foreground">Assist Totali</div>
+            </div>
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-3xl font-bold text-blue-600">{playerStats.totals.totals.offensive_rebounds}</div>
+              <div className="text-sm text-muted-foreground">Rimbalzi Offensivi</div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-3xl font-bold text-green-600">{playerStats.totals.totals.defensive_rebounds}</div>
+              <div className="text-sm text-muted-foreground">Rimbalzi Difensivi</div>
+            </div>
             <div className="text-center p-4 bg-purple-50 rounded-lg">
               <div className="text-3xl font-bold text-purple-600">{playerStats.totals.totals.total_rebounds}</div>
               <div className="text-sm text-muted-foreground">Rimbalzi Totali</div>
             </div>
-            <div className="text-center p-4 bg-orange-50 rounded-lg">
-              <div className="text-3xl font-bold text-orange-600">{playerStats.totals.totals.assists}</div>
-              <div className="text-sm text-muted-foreground">Assist Totali</div>
-            </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="text-center p-4 bg-red-50 rounded-lg">
               <div className="text-3xl font-bold text-red-600">{playerStats.totals.totals.steals}</div>
-              <div className="text-sm text-muted-foreground">Palle Rubate Totali</div>
+              <div className="text-sm text-muted-foreground">Palle Rubate</div>
             </div>
             <div className="text-center p-4 bg-indigo-50 rounded-lg">
               <div className="text-3xl font-bold text-indigo-600">{playerStats.totals.totals.blocks}</div>
-              <div className="text-sm text-muted-foreground">Stoppate Totali</div>
+              <div className="text-sm text-muted-foreground">Stoppate</div>
             </div>
             <div className="text-center p-4 bg-yellow-50 rounded-lg">
               <div className="text-3xl font-bold text-yellow-600">{playerStats.totals.totals.turnovers}</div>
-              <div className="text-sm text-muted-foreground">Perse Totali</div>
+              <div className="text-sm text-muted-foreground">Perse</div>
             </div>
-            <div className="text-center p-4 bg-cyan-50 rounded-lg">
-              <div className="text-3xl font-bold text-cyan-600">{playerStats.totals.totals.personal_fouls}</div>
-              <div className="text-sm text-muted-foreground">Falli Personali Totali</div>
+            <div className="text-center p-4 bg-pink-50 rounded-lg">
+              <div className="text-3xl font-bold text-pink-600">{playerStats.totals.totals.personal_fouls}</div>
+              <div className="text-sm text-muted-foreground">Falli Personali</div>
             </div>
           </div>
         </CardContent>
