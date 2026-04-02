@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Target, TrendingUp, HandHeart, Activity, Award, Clock, BarChart3 } from 'lucide-react'
 import type { PlayerStat } from '@/models/game'
+import { calculateEfficiency, calculatePIR, safeNumber } from '@/lib/advancedStats'
 
 interface PlayerStatModalProps {
   isOpen: boolean
@@ -30,10 +31,6 @@ export function PlayerStatModal({ isOpen, onClose, playerStat, playerName }: Pla
       return '0.0%'
     }
     return numValue.toFixed(1) + '%'
-  }
-
-  const safeNumber = (value: number | null | undefined): number => {
-    return value !== null && value !== undefined ? value : 0
   }
 
   return (
@@ -222,7 +219,7 @@ export function PlayerStatModal({ isOpen, onClose, playerStat, playerName }: Pla
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-3 bg-purple-50 rounded-lg">
                     <div className="text-2xl font-bold text-purple-600">
-                      {playerStat.efficiency !== null ? playerStat.efficiency.toFixed(1) : '0.0'}
+                      {calculateEfficiency(playerStat).toFixed(1)}
                     </div>
                     <div className="text-xs text-muted-foreground">Efficienza</div>
                   </div>
@@ -250,9 +247,7 @@ export function PlayerStatModal({ isOpen, onClose, playerStat, playerName }: Pla
             <CardContent>
               <div className="flex justify-center">
                 <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                  <div className="text-3xl font-bold text-yellow-600">
-                    {playerStat.performance_index_rating !== null ? playerStat.performance_index_rating : 0}
-                  </div>
+                  <div className="text-3xl font-bold text-yellow-600">{calculatePIR(playerStat)}</div>
                   <div className="text-sm text-muted-foreground">Performance Index Rating (PIR)</div>
                   <div className="text-xs text-muted-foreground mt-1">
                     Formula: Punti + Rimbalzi + Assist + Rubate + Stoppate - Tiri Sbagliati - Liberi Sbagliati - Perse

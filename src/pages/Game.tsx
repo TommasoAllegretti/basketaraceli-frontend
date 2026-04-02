@@ -20,6 +20,7 @@ import { getPlayers } from '@/api/playerService'
 import { getGameStats } from '@/api/gameStatService'
 import { getPlayerStats } from '@/api/playerStatService'
 import { downloadGameStatsPdf, getPdfErrorMessage } from '@/api/pdfService'
+import { calculateEfficiency, calculatePIR } from '@/lib/advancedStats'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToastHelpers } from '@/hooks/useToastHelpers'
 import type { Game as GameType, PlayerStat } from '@/models/game'
@@ -584,7 +585,7 @@ function GameContent() {
                 const assists = stat.assists ?? 0
                 const steals = stat.steals ?? 0
                 const blocks = stat.blocks ?? 0
-                const efficiency = stat.efficiency ?? 0
+                const efficiency = calculateEfficiency(stat)
                 const turnovers = stat.turnovers ?? 0
                 const fouls = stat.personal_fouls ?? 0
 
@@ -639,7 +640,7 @@ function GameContent() {
                             <div className="text-xs text-muted-foreground">Assist</div>
                           </div>
                           <div className="text-center">
-                            <div className="font-bold text-lg text-yellow-600">{mvpPlayer.efficiency ?? 0}</div>
+                            <div className="font-bold text-lg text-yellow-600">{calculateEfficiency(mvpPlayer)}</div>
                             <div className="text-xs text-muted-foreground">Efficienza</div>
                           </div>
                         </div>
@@ -697,6 +698,7 @@ function GameContent() {
                           3,
                         ),
                         efficiency: findBestPlayers('efficiency'),
+                        pir: game.stats.sort((a, b) => calculatePIR(b) - calculatePIR(a)).slice(0, 3),
                       }
 
                       const statCards = [
@@ -770,11 +772,20 @@ function GameContent() {
                         {
                           title: 'Efficienza',
                           players: bestPlayers.efficiency,
-                          getValue: (player: PlayerStat) => player.efficiency ?? 0,
-                          suffix: 'PIR',
+                          getValue: (player: PlayerStat) => calculateEfficiency(player),
+                          suffix: '',
                           bgColor: 'bg-yellow-100',
                           textColor: 'text-yellow-600',
                           icon: '⭐',
+                        },
+                        {
+                          title: 'PIR',
+                          players: bestPlayers.pir,
+                          getValue: (player: PlayerStat) => calculatePIR(player),
+                          suffix: 'PIR',
+                          bgColor: 'bg-purple-100',
+                          textColor: 'text-purple-600',
+                          icon: '📊',
                         },
                       ]
 
@@ -856,7 +867,7 @@ function GameContent() {
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-1 text-xs text-muted-foreground">
                     {stat.field_goal_percentage && <div>Tiri: {stat.field_goal_percentage}%</div>}
-                    {stat.efficiency !== null && <div>Efficienza: {stat.efficiency}</div>}
+                    <div>Efficienza: {calculateEfficiency(stat)}</div>
                   </div>
                 </div>
               ))}

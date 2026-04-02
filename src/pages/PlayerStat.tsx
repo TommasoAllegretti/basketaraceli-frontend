@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { getPlayerDetailedStats } from '@/api/playerStatService'
 import type { PlayerStatsResponse } from '@/models/playerStat'
+import { calculateEfficiency, calculatePIR } from '@/lib/advancedStats'
 
 export function PlayerStat() {
   const [searchParams] = useSearchParams()
@@ -178,130 +179,108 @@ export function PlayerStat() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Trophy className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{playerStats.totals.games_played}</p>
-                <p className="text-sm text-muted-foreground">Partite Giocate</p>
-              </div>
+      {/* Statistiche Medie */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            Statistiche Medie
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-3xl font-bold text-green-600">{playerStats.totals.averages.points.toFixed(1)}</div>
+              <div className="text-sm text-muted-foreground">Punti</div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Target className="h-5 w-5 text-green-600" />
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-3xl font-bold text-purple-600">
+                {playerStats.totals.averages.total_rebounds.toFixed(1)}
               </div>
-              <div>
-                <p className="text-2xl font-bold">{playerStats.totals.averages.points.toFixed(1)}</p>
-                <p className="text-sm text-muted-foreground">Punti per Partita</p>
-              </div>
+              <div className="text-sm text-muted-foreground">Rimbalzi</div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{playerStats.totals.averages.total_rebounds.toFixed(1)}</p>
-                <p className="text-sm text-muted-foreground">Rimbalzi per Partita</p>
-              </div>
+            <div className="text-center p-4 bg-orange-50 rounded-lg">
+              <div className="text-3xl font-bold text-orange-600">{playerStats.totals.averages.assists.toFixed(1)}</div>
+              <div className="text-sm text-muted-foreground">Assist</div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <HandHeart className="h-5 w-5 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{playerStats.totals.averages.assists.toFixed(1)}</p>
-                <p className="text-sm text-muted-foreground">Assist per Partita</p>
-              </div>
+            <div className="text-center p-4 bg-red-50 rounded-lg">
+              <div className="text-3xl font-bold text-red-600">{playerStats.totals.averages.steals.toFixed(1)}</div>
+              <div className="text-sm text-muted-foreground">Palle Rubate</div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Statistiche di Tiro
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-blue-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">
-                  {formatPercentage(playerStats.totals.averages.field_goal_percentage)}
-                </div>
-                <div className="text-xs text-muted-foreground">% Tiri dal Campo</div>
-              </div>
-              <div className="text-center p-3 bg-green-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">
-                  {formatPercentage(playerStats.totals.averages.three_point_field_goal_percentage)}
-                </div>
-                <div className="text-xs text-muted-foreground">% Tiri da 3</div>
-              </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
+            <div className="text-center p-4 bg-indigo-50 rounded-lg">
+              <div className="text-3xl font-bold text-indigo-600">{playerStats.totals.averages.blocks.toFixed(1)}</div>
+              <div className="text-sm text-muted-foreground">Stoppate</div>
             </div>
-            <div className="text-center p-3 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">
-                {formatPercentage(playerStats.totals.averages.free_throw_percentage)}
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-3xl font-bold text-blue-600">
+                {formatPercentage(playerStats.totals.averages.field_goal_percentage)}
               </div>
-              <div className="text-xs text-muted-foreground">% Tiri Liberi</div>
+              <div className="text-sm text-muted-foreground">% Tiri dal Campo</div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              Altre Statistiche
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-red-50 rounded-lg">
-                <div className="text-2xl font-bold text-red-600">{playerStats.totals.averages.steals.toFixed(1)}</div>
-                <div className="text-xs text-muted-foreground">Palle Rubate/Partita</div>
+            <div className="text-center p-4 bg-cyan-50 rounded-lg">
+              <div className="text-3xl font-bold text-cyan-600">
+                {formatPercentage(playerStats.totals.averages.three_point_field_goal_percentage)}
               </div>
-              <div className="text-center p-3 bg-indigo-50 rounded-lg">
-                <div className="text-2xl font-bold text-indigo-600">
-                  {playerStats.totals.averages.blocks.toFixed(1)}
-                </div>
-                <div className="text-xs text-muted-foreground">Stoppate/Partita</div>
-              </div>
+              <div className="text-sm text-muted-foreground">% Tiri da 3</div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                <div className="text-2xl font-bold text-yellow-600">
-                  {playerStats.totals.averages.efficiency.toFixed(1)}
-                </div>
-                <div className="text-xs text-muted-foreground">Efficienza Media</div>
+            <div className="text-center p-4 bg-yellow-50 rounded-lg">
+              <div className="text-3xl font-bold text-yellow-600">
+                {playerStats.totals.averages.efficiency.toFixed(1)}
               </div>
-              <div className="text-center p-3 bg-cyan-50 rounded-lg">
-                <div className="text-2xl font-bold text-cyan-600">{playerStats.totals.totals.total_rebounds}</div>
-                <div className="text-xs text-muted-foreground">Rimbalzi Totali</div>
-              </div>
+              <div className="text-sm text-muted-foreground">Efficienza Media</div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
+      {/* Statistiche Totali */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5" />
+            Statistiche Totali
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-3xl font-bold text-blue-600">{playerStats.totals.games_played}</div>
+              <div className="text-sm text-muted-foreground">Partite Giocate</div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-3xl font-bold text-green-600">{playerStats.totals.totals.points}</div>
+              <div className="text-sm text-muted-foreground">Punti Totali</div>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-3xl font-bold text-purple-600">{playerStats.totals.totals.total_rebounds}</div>
+              <div className="text-sm text-muted-foreground">Rimbalzi Totali</div>
+            </div>
+            <div className="text-center p-4 bg-orange-50 rounded-lg">
+              <div className="text-3xl font-bold text-orange-600">{playerStats.totals.totals.assists}</div>
+              <div className="text-sm text-muted-foreground">Assist Totali</div>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
+            <div className="text-center p-4 bg-red-50 rounded-lg">
+              <div className="text-3xl font-bold text-red-600">{playerStats.totals.totals.steals}</div>
+              <div className="text-sm text-muted-foreground">Palle Rubate Totali</div>
+            </div>
+            <div className="text-center p-4 bg-indigo-50 rounded-lg">
+              <div className="text-3xl font-bold text-indigo-600">{playerStats.totals.totals.blocks}</div>
+              <div className="text-sm text-muted-foreground">Stoppate Totali</div>
+            </div>
+            <div className="text-center p-4 bg-yellow-50 rounded-lg">
+              <div className="text-3xl font-bold text-yellow-600">{playerStats.totals.totals.turnovers}</div>
+              <div className="text-sm text-muted-foreground">Perse Totali</div>
+            </div>
+            <div className="text-center p-4 bg-cyan-50 rounded-lg">
+              <div className="text-3xl font-bold text-cyan-600">{playerStats.totals.totals.personal_fouls}</div>
+              <div className="text-sm text-muted-foreground">Falli Personali Totali</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -391,15 +370,15 @@ export function PlayerStat() {
                   <div className="flex justify-center gap-4 mt-3">
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
                       <Award className="h-4 w-4" />
-                      Efficienza: {stat.efficiency.toFixed(1)}
+                      Efficienza: {calculateEfficiency(stat).toFixed(1)}
                     </div>
                     <div
                       className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
-                        stat.performance_index_rating >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        calculatePIR(stat) >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}
                     >
                       <TrendingUp className="h-4 w-4" />
-                      PIR: {stat.performance_index_rating}
+                      PIR: {calculatePIR(stat)}
                     </div>
                   </div>
                 </div>
